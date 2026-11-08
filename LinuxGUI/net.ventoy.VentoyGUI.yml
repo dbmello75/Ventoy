@@ -173,13 +173,12 @@ modules:
         sha256: 3379c99890359dcff55aab7f7b3286f87c988d1da2fd616e6a9e305fb0a1de9e
         strip-components: 1
     build-commands:
-      - cp -r ventoy-1.1.05/* /app/
+      - cp -r . /app/
   - name: ventoy_gui
     buildsystem: simple
     sources:
-      - type: git
-        url: https://github.com/LorenzoIanotto/VentoyUDisks.git
-        branch: udisks
+      - type: dir
+        path: ..
       - type: script
         dest-filename: ventoy-gtk3.sh
         commands:

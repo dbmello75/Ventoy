@@ -5451,7 +5451,6 @@ int ventoy_http_stop(void)
 
 int ventoy_http_init(void)
 {
-    int i = 0;
 
 #ifdef VENTOY_SIM
     char *Buffer = NULL;
