@@ -1,19 +1,19 @@
- L - Izbor jezika
-F1 - Prikaži informacije za pomoć
-F2 - Pretraži i pokreni datoteke sa lokalnog diska
-F3 - Prebaci režim menija između Prikaza stabla <-> Prikaza liste
-F4 - Pokreni Windows/Linux sa lokalnog diska
-F5 - Alati
-F6 - Učitaj prilagođeni Grub2 meni
-F7 - Prebaci između GUI režima <-> TEXT režima
+ L - Изаберите језик
+F1 - Приказује помоћне информације
+F2 - Прегледа и покреће имиџ фајлове на локалном диску
+F3 - Мења мени између TreeView <-> ListView
+F4 - Boot-ује Windows/Linux на локалном диску
+F5 - Алати
+F6 - Учитава прилагођен Grub2 мени
+F7 - Мења између GUI <-> TEXT режима
 
-m/Ctrl+m - Proveri kontrolni zbir datoteka slike (md5/sha1/sha256/sha512)
-d/Ctrl+d - Memdisk režim (Samo za male WinPE/LiveCD ISO/IMG datoteke)
-w/Ctrl+w - WIMBOOT režim (Samo za Windows/WinPE ISO datoteke)
-r/Ctrl+r - Grub2 režim (Samo za neke Linux distribucije)
-i/Ctrl+i - Kompatibilni režim (Samo za otklanjanje grešaka)
-u/Ctrl+u - Učitaj ISO EFI drajver (Samo za otklanjanje grešaka, ne može se koristiti zvanično)
+m/Ctrl+m - Генерише хеш одабраног имиџ фајла (md5/sha1/sha256/sha512)
+d/Ctrl+d - Memdisk режим (само за мале WinPE/LiveCD ISO/IMG имиџ фајлове)
+w/Ctrl+w - WIMBOOT режим (само за Windows/WinPE имиџ фајлове)
+r/Ctrl+r - Grub2 режим (само за неке Linux дистрибуције)
+i/Ctrl+i - Компатибилни режим (само за debug-овање)
+u/Ctrl+u - Учитава ISO EFI драјвер (само за debug-овање, не може се званично користити)
 
 
 
-Pritisnite ESC za povratak ......
+Притисните ESC за повратак ......
