@@ -24,7 +24,7 @@ else
     echo -e "\n========== FAILED ============\n"
 fi
 
-if uname -a | egrep -q 'x86_64|amd64'; then
+if uname -a | grep -e -q 'x86_64|amd64'; then
     name=unsquashfs_64
 elif uname -a | egrep -q 'aarch64'; then
     name=unsquashfs_aa64
