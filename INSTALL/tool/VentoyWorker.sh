@@ -252,25 +252,28 @@ if [ "$MODE" = "install" -a -z "$NONDESTRUCTIVE" ]; then
     fi
     echo ''
 
-    vtwarn "Attention:"
-    vtwarn "You will install Ventoy to $DISK."
-    vtwarn "All the data on the disk $DISK will be lost!!!"
-    echo ""
+    if [ -z "$FORCE" ]; then
+        vtwarn "Attention:"
+        vtwarn "You will install Ventoy to $DISK."
+        vtwarn "All the data on the disk $DISK will be lost!!!"
+        echo ""
 
-    read -p 'Continue? (y/n) '  Answer
-    if [ "$Answer" != "y" ]; then
-        if [ "$Answer" != "Y" ]; then
-            exit 0
+        read -p 'Continue? (y/n) '  Answer
+        if [ "$Answer" != "y" ]; then
+            if [ "$Answer" != "Y" ]; then
+                exit 0
+            fi
         fi
-    fi
 
-    echo ""
-    vtwarn "All the data on the disk $DISK will be lost!!!"
-    read -p 'Double-check. Continue? (y/n) '  Answer
-    if [ "$Answer" != "y" ]; then
-        if [ "$Answer" != "Y" ]; then
-            exit 0
+        echo ""
+        vtwarn "All the data on the disk $DISK will be lost!!!"
+        read -p 'Double-check. Continue? (y/n) '  Answer
+        if [ "$Answer" != "y" ]; then
+            if [ "$Answer" != "Y" ]; then
+                exit 0
+            fi
         fi
+
     fi
 
     if [ $disk_sector_num -le $VENTOY_SECTOR_NUM ]; then
