@@ -23,3 +23,7 @@ sh ./build.sh      || exit 1
 echo '======== build EDK2 for x86_64-efi ==============='
 sh ./build_shim.sh      || exit 1
 
+
+if [ "${VTOY_BUILD_LOONGARCH:-0}" = "1" ]; then
+    sh ./buildloongarch64.sh || exit 1
+fi
