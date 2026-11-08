@@ -762,42 +762,57 @@ int vtoy_json_destroy(VTOY_JSON *pstJson)
     return JSON_SUCCESS;
 }
 
+/* Return bytes written, excluding NUL. Truncation keeps a valid JSON string
+ * followed by the comma/newline expected by the surrounding formatter. */
 int vtoy_json_escape_string(char *buf, int buflen, const char *str, int newline)
 {
-    char last = 0;
+    static const char hex[] = "0123456789abcdef";
     int count = 0;
+    int suffix = newline ? 3 : 2;
+    const unsigned char *p = (const unsigned char *)(str ? str : "");
 
-    *buf++ = '"';
-    count++;
+    if (!buf || buflen <= 0)
+        return 0;
+    buf[0] = '\0';
+    if (buflen < suffix + 2)
+        return 0;
 
-    while (*str)
+    buf[count++] = '"';
+    while (*p)
     {
-        if (*str == '"' && last != '\\')
+        char escaped[6];
+        int len = 1;
+        escaped[0] = (char)*p;
+        switch (*p)
         {
-            *buf = '\\';
-            count++;
-            buf++;
+            case '"': case '\\':
+                escaped[0] = '\\'; escaped[1] = (char)*p; len = 2;
+                break;
+            case '\b': case '\f': case '\n': case '\r': case '\t':
+                escaped[0] = '\\'; len = 2;
+                escaped[1] = *p == '\b' ? 'b' : *p == '\f' ? 'f' :
+                             *p == '\n' ? 'n' : *p == '\r' ? 'r' : 't';
+                break;
+            default:
+                if (*p < 32)
+                {
+                    escaped[0] = '\\'; escaped[1] = 'u';
+                    escaped[2] = '0'; escaped[3] = '0';
+                    escaped[4] = hex[*p >> 4]; escaped[5] = hex[*p & 15];
+                    len = 6;
+                }
+                break;
         }
-    
-        *buf = *str;
-        count++;
-        buf++;
-
-        last = *str;
-        str++;
+        if (len > buflen - count - suffix - 1)
+            break;
+        memcpy(buf + count, escaped, len);
+        count += len;
+        ++p;
     }
-
-    *buf++ = '"';
-    count++;
-    
-    *buf++ = ',';
-    count++;
-
+    buf[count++] = '"';
+    buf[count++] = ',';
     if (newline)
-    {
-        *buf++ = '\n';
-        count++;        
-    }
-
+        buf[count++] = '\n';
+    buf[count] = '\0';
     return count;
 }
