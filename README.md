@@ -13,10 +13,10 @@
 <p>Ventoy is an open source tool to create bootable USB drive from ISO/WIM/IMG/VHD(x)/EFI files. </p>
 <p>With Ventoy, you don't need to format the disk over and over again, just copy the image files to the USB drive and boot them.</p>
 <p>You can copy many image files at a time and Ventoy will give you a boot menu to select them. </p>
-<p>You can also browse ISO/WIM/IMG/VHD(x)/EFI files in local disk and boot them.</p>
+<p>You can also browse ISO/WIM/IMG/VHD(x)/EFI files on local disks and boot them.</p>
 <p>x86 Legacy BIOS, IA32 UEFI, x86_64 UEFI, ARM64 UEFI and MIPS64EL UEFI are supported in the same way.</p>
 <p>Both MBR and GPT partition styles are supported.</p>
-<p>Most type of OS supported(Windows/WinPE/Linux/Unix/ChromeOS/Vmware/Xen...) </p>
+<p>Most types of operating systems are supported(Windows/WinPE/Linux/Unix/ChromeOS/Vmware/Xen...) </p>
 <p>1300+ ISO files are tested (<a href="https://www.ventoy.net/en/isolist.html">List</a>). 90%+ distros in <a href="https://distrowatch.com/">distrowatch.com</a> supported (<a href="https://www.ventoy.net/en/distrowatch.html">Details</a>). </p>
 <p>Official Website: <a href=https://www.ventoy.net>https://www.ventoy.net</a></p>
 
@@ -66,7 +66,7 @@ VMware ESXi, Citrix XenServer, Xen XCP-ng
 [【How to report a successfully tested image file】](https://github.com/ventoy/Ventoy/issues/1195)
 
 # Ventoy Browser
-With Ventoy, you can also browse ISO/WIM/IMG/VHD(x)/EFI files in local disk and boot them. [Notes](https://www.ventoy.net/en/doc_browser.html)
+With Ventoy, you can also browse ISO/WIM/IMG/VHD(x)/EFI files on local disks and boot them. [Notes](https://www.ventoy.net/en/doc_browser.html)
   
 # VentoyPlugson
 A GUI Ventoy plugin configurator. [VentoyPlugson](https://www.ventoy.net/en/plugin_plugson.html)
@@ -77,7 +77,7 @@ A GUI Ventoy plugin configurator. [VentoyPlugson](https://www.ventoy.net/en/plug
 * Fast (limited only by the speed of copying iso file)
 * Can be installed in USB/Local Disk/SSD/NVMe/SD Card
 * Directly boot from ISO/WIM/IMG/VHD(x)/EFI files, no extraction needed
-* Support to browse and boot ISO/WIM/IMG/VHD(x)/EFI files in local disk
+* Support to browse and boot ISO/WIM/IMG/VHD(x)/EFI files on local disks
 * No need to be continuous in disk for ISO/WIM/IMG/VHD(x)/EFI files
 * MBR and GPT partition style supported (1.0.15+)
 * x86 Legacy BIOS, IA32 UEFI, x86_64 UEFI, ARM64 UEFI, MIPS64EL UEFI supported
@@ -111,7 +111,7 @@ A GUI Ventoy plugin configurator. [VentoyPlugson](https://www.ventoy.net/en/plug
 See all supported languages here: [languages_list.md](LANGUAGES/languages_list.md)
 
 # Installation Instructions
-See [https://www.ventoy.net/en/doc_start.html](https://www.ventoy.net/en/doc_start.html) for detailed instructions. 
+See [https://www.ventoy.net/en/doc_start.html](https://www.ventoy.net/en/doc_start.html) for detailsed instructions. 
 
 # Compile Instructions
 With Docker and Docker Compose installed, run `docker compose up` from the repository root. The packages are written to `INSTALL/`. GitHub Actions also publishes CI build artifacts.
@@ -147,7 +147,7 @@ Title | Link
 
 
 # FAQ
-See [https://www.ventoy.net/en/faq.html](https://www.ventoy.net/en/faq.html) for detail
+See [https://www.ventoy.net/en/faq.html](https://www.ventoy.net/en/faq.html) for details
 
 
 # Forum
