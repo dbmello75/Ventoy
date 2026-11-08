@@ -23,7 +23,7 @@ fi
 rm -rf ISO_TMP
 cp -a ISO ISO_TMP
 
-cp -a VTOY VTOY_TMP 
+cp -a VTOY VTOY_TMP
 
 ls -la
 if ! [ -d ISO_TMP ]; then
@@ -81,4 +81,3 @@ xorriso -as mkisofs  -allow-lowercase  --sort-weight 0 / --sort-weight 1 /EFI  -
 
 cd ../
 rm -rf ISO_TMP
-

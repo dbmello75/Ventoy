@@ -20,19 +20,19 @@ mips64el-linux-musl-gcc -mips64r2 -mabi=64 -static -Os -D_FILE_OFFSET_BITS=64 vt
 # Check compilation success
 if [ -e vtoygpt_64 ] && [ -e vtoygpt_32 ] && [ -e vtoygpt_aa64 ] && [ -e vtoygpt_m64e ]; then
     echo -e '\n############### SUCCESS ###############\n'
-    
+
     # Move files to installation directories
     mv vtoygpt_64 ../INSTALL/tool/x86_64/vtoygpt
     mv vtoygpt_32 ../INSTALL/tool/i386/vtoygpt
-    
+
     # Strip symbols and move aarch64 executable
     aarch64-buildroot-linux-uclibc-strip --strip-all vtoygpt_aa64
     mv vtoygpt_aa64 ../INSTALL/tool/aarch64/vtoygpt
-    
+
     # Strip symbols and move mips64el executable
     mips64el-linux-musl-strip --strip-all vtoygpt_m64e
     mv vtoygpt_m64e ../INSTALL/tool/mips64el/vtoygpt
-    
+
     echo -e 'Compilation successful. Executables moved to the installation directory.'
 else
     echo -e '\n############### FAILED ################\n'

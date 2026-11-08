@@ -171,13 +171,13 @@ int main(int argc __unused, char **argv)
 	signal(SIGTERM, SIG_IGN);
 
     if ((pid = fork()) == 0) {
-    
+
         setctty(_PATH_CONSOLE);
         sysctlbyname("debug.bootverbose", &boot_verbose, &varsize, NULL, 0);
 
         vdebug("======= Ventoy Init Start ========\n");
 
-    	ventoy_init();
+        ventoy_init();
         exit(1);	/* force single user mode */
 	}
 
@@ -206,4 +206,3 @@ chroot_failed:
 	};
 	return 1;
 }
-

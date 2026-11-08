@@ -488,7 +488,7 @@ redraw_timeouts (struct grub_gfxmenu_view *view)
     }
 }
 
-void 
+void
 grub_gfxmenu_print_timeout (int timeout, void *data)
 {
   struct grub_gfxmenu_view *view = data;
@@ -503,7 +503,7 @@ grub_gfxmenu_print_timeout (int timeout, void *data)
     redraw_timeouts (view);
 }
 
-void 
+void
 grub_gfxmenu_clear_timeout (void *data)
 {
   struct grub_gfxmenu_view *view = data;
@@ -676,7 +676,7 @@ grub_gfxmenu_redraw_menu (grub_gfxmenu_view_t view)
   else
     grub_gui_iterate_recursively ((grub_gui_component_t) view->canvas,
                                   redraw_menu_visit, view);
-  
+
   grub_video_swap_buffers ();
   if (view->double_repaint)
     {
@@ -689,7 +689,7 @@ grub_gfxmenu_redraw_menu (grub_gfxmenu_view_t view)
 }
 
 
-void 
+void
 grub_gfxmenu_set_chosen_entry (int entry, void *data)
 {
   grub_gfxmenu_view_t view = data;
@@ -772,7 +772,7 @@ grub_gfxmenu_draw_terminal_box (void)
 
   term_box->set_content_size (term_box, term_view->terminal_rect.width,
 			      term_view->terminal_rect.height);
-  
+
   term_box->draw (term_box,
 		  term_view->terminal_rect.x - term_box->get_left_pad (term_box),
 		  term_view->terminal_rect.y - term_box->get_top_pad (term_box));

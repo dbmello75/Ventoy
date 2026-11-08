@@ -40,4 +40,3 @@ fi
 
 rm -f ../../$name
 cp -a unsquashfs ../../$name
-

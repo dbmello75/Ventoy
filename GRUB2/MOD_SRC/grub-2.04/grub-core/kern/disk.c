@@ -377,7 +377,7 @@ grub_disk_read_small_real (grub_disk_t disk, grub_disk_addr_t sector,
     tmp_buf = grub_malloc (num << disk->log_sector_size);
     if (!tmp_buf)
       return grub_errno;
-    
+
     if ((disk->dev->disk_read) (disk, transform_sector (disk, aligned_sector),
 				num, tmp_buf))
       {
@@ -409,7 +409,7 @@ grub_disk_read_small (grub_disk_t disk, grub_disk_addr_t sector,
   return GRUB_ERR_NONE;
 }
 
-grub_err_t grub_disk_blocklist_read(void *chunklist, grub_uint64_t sector, 
+grub_err_t grub_disk_blocklist_read(void *chunklist, grub_uint64_t sector,
     grub_uint64_t size, grub_uint32_t log_sector_size)
 {
     grub_uint64_t sizeshift;
@@ -466,7 +466,7 @@ grub_err_t grub_disk_blocklist_read(void *chunklist, grub_uint64_t sector,
     return 0;
 }
 
-grub_err_t grub_disk_blocklist_read2(grub_disk_t disk, grub_uint64_t sector, 
+grub_err_t grub_disk_blocklist_read2(grub_disk_t disk, grub_uint64_t sector,
     grub_uint64_t size, char *buf)
 {
     ventoy_img_chunk_list *chunk_list = (ventoy_img_chunk_list *)(disk->read_hook_data);
@@ -592,7 +592,7 @@ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
 					buf);
 	  if (err)
 	    return err;
-	  
+
 	  for (i = 0; i < agglomerate; i ++)
 	    grub_disk_cache_store (disk->dev->id, disk->id,
 				   sector + (i << GRUB_DISK_CACHE_BITS),
@@ -607,7 +607,7 @@ grub_disk_read (grub_disk_t disk, grub_disk_addr_t sector,
 
 	  sector += agglomerate << GRUB_DISK_CACHE_BITS;
 	  size -= agglomerate << (GRUB_DISK_CACHE_BITS + GRUB_DISK_SECTOR_BITS);
-	  buf = (char *) buf 
+	  buf = (char *) buf
 	    + (agglomerate << (GRUB_DISK_CACHE_BITS + GRUB_DISK_SECTOR_BITS));
 	}
 

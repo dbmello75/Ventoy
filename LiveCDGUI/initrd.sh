@@ -34,7 +34,7 @@ mkdir ventoy
 tar -xf $VENTOY_PATH/INSTALL/ventoy-${version}-linux.tar.gz -C .
 mv ./ventoy-${version}  ./ventoy/ventoy
 chmod -R 777 ./ventoy
-mksquashfs ventoy ventoy.xzm  -comp xz 
+mksquashfs ventoy ventoy.xzm  -comp xz
 rm -rf ./ventoy
 
 
@@ -43,4 +43,3 @@ find . | cpio --quiet -o -H newc  > ../initrd.img
 
 cd ..
 rm -rf _INITRD_
-

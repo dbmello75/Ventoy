@@ -35,7 +35,7 @@ sh buildedk.sh >> $LOG 2>&1 || exit 1
 # If you want to rebuild them, just uncomment them and the below tools.
 #
 #
-#wget -q -P /opt/ https://github.com/ventoy/musl-cross-make/releases/download/latest/output.tar.bz2 
+#wget -q -P /opt/ https://github.com/ventoy/musl-cross-make/releases/download/latest/output.tar.bz2
 #cd $VTOY_PATH/DOC
 #tar xf musl-1.2.1.tar.gz
 #cd musl-1.2.1

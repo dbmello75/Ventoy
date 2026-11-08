@@ -35,7 +35,7 @@ function callVtoy(p1, p2, p3) {
             }
             else if(undefined === errorThrown.length)
             {
-                
+
             }
             else if('' == errorThrown.trim())
             {
@@ -84,11 +84,11 @@ function callVtoyASyncTimeout(time, data, func) {
         success: func,
         error: function(xmlHttpRequest, textStatus, errorThrown) {
             if(undefined === errorThrown)
-            {                
+            {
             }
             else if(undefined === errorThrown.length)
             {
-                
+
             }
             else if('' == errorThrown.trim())
             {
@@ -132,19 +132,19 @@ function callVtoySync(data, func) {
         dataType: 'json',
         async: false,
         data: JSON.stringify(data),
-        success: function VtoyCallFuncWrapper(data) {            
+        success: function VtoyCallFuncWrapper(data) {
             if (data.result === 'tokenerror') {
                 const titlestr = '<span class="fa  fa-minus-circle" style="color:#dd4b39; font-weight:bold;"> ' + vtoy_cur_language.STR_ERROR + '</span>';
                 const msgstr = '<span style="font-size:14px; font-weight:bold;"> ' + vtoy_cur_language.STR_WEB_TOKEN_MISMATCH + '</span>';
-                
+
                 Modal.alert({title:titlestr, msg:msgstr, btnok:vtoy_cur_language.STR_BTN_OK }).on(function(e) {
                     window.location.reload(true);
                 });
-            } 
+            }
             else if (data.result === 'busy') {
                 const titlestr = '<span class="fa fa-check-circle" style="color:green; font-weight:bold;"> ' + vtoy_cur_language.STR_INFO + '</span>';
                 const msgstr = '<span style="font-size:14px; font-weight:bold;"> ' + vtoy_cur_language.STR_WEB_SERVICE_BUSY + '</span>';
-                Modal.alert({title:titlestr, msg:msgstr, btnok:vtoy_cur_language.STR_BTN_OK });                
+                Modal.alert({title:titlestr, msg:msgstr, btnok:vtoy_cur_language.STR_BTN_OK });
             }else {
                 func(data);
             }
@@ -156,7 +156,7 @@ function callVtoySync(data, func) {
             }
             else if(undefined === errorThrown.length)
             {
-                
+
             }
             else if('' == errorThrown.trim())
             {
@@ -195,14 +195,14 @@ function callVtoySync(data, func) {
 
 const vtoy = {
     baseurl : '',
-    status: '',    
+    status: '',
     scan: {
         time: 3,
         ret: []
     }
 }
 
-// 
+//
 String.prototype.endsWith = function(str) {
     if (str == null || str == "" || this.length == 0 || str.length > this.length)
         return false;
@@ -220,7 +220,7 @@ window.Message = function() {
         }
         _show(o);
     }
-    
+
     const _show = function(options) {
         const ops = {
             msg : "提示内容",
@@ -254,7 +254,7 @@ window.Message = function() {
             $div.remove();
         }, ops.time);
     }
-    
+
     const _success = function(msg, time) {
         _showMsg('s', msg, time);
     }
@@ -267,7 +267,7 @@ window.Message = function() {
     const _info = function(msg, time) {
         _showMsg('i', msg, time);
     }
-    
+
     return {
         success : _success,
         error	: _error,
@@ -276,4 +276,3 @@ window.Message = function() {
         show	: _show
     }
 }();
-

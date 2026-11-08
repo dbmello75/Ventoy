@@ -128,7 +128,7 @@ void dump_queue(struct queue *queue)
 	pthread_cleanup_push((void *) pthread_mutex_unlock, &queue->mutex);
 	pthread_mutex_lock(&queue->mutex);
 
-	printf("\tMax size %d, size %d%s\n", queue->size - 1,  
+	printf("\tMax size %d, size %d%s\n", queue->size - 1,
 		queue->readp <= queue->writep ? queue->writep - queue->readp :
 			queue->size - queue->readp + queue->writep,
 		queue->readp == queue->writep ? " (EMPTY)" :
@@ -218,7 +218,7 @@ struct file_buffer *seq_queue_get(struct seq_queue *queue)
 			break;
 		}
 
-		/* entry not found, wait for it to arrive */	
+		/* entry not found, wait for it to arrive */
 		pthread_cond_wait(&queue->wait, &queue->mutex);
 	}
 
@@ -329,7 +329,7 @@ struct cache *cache_init(int buffer_size, int max_buffers, int noshrink_lookup,
 struct file_buffer *cache_lookup(struct cache *cache, long long index)
 {
 	/* Lookup block in the cache, if found return with usage count
- 	 * incremented, if not found return NULL */
+         * incremented, if not found return NULL */
 	int hash = CALCULATE_CACHE_HASH(index);
 	struct file_buffer *entry;
 
@@ -342,8 +342,8 @@ struct file_buffer *cache_lookup(struct cache *cache, long long index)
 
 	if(entry) {
 		/* found the block in the cache, increment used count and
- 		 * if necessary remove from free list so it won't disappear
- 		 */
+                 * if necessary remove from free list so it won't disappear
+                 */
 		if(entry->used == 0) {
 			remove_free_list(&cache->free_list, entry);
 			cache->used ++;
@@ -390,12 +390,12 @@ static struct file_buffer *_cache_get(struct cache *cache, long long index,
 {
 	/* Get a free block out of the cache indexed on index. */
 	struct file_buffer *entry = NULL;
- 
+
 	pthread_cleanup_push((void *) pthread_mutex_unlock, &cache->mutex);
 	pthread_mutex_lock(&cache->mutex);
 
 	while(1) {
-		if(cache->noshrink_lookup) {	
+		if(cache->noshrink_lookup) {
 			/* first try to get a block from the free list */
 			if(cache->first_freelist && cache->free_list)
 				entry = cache_freelist(cache);
@@ -467,11 +467,11 @@ void cache_block_put(struct file_buffer *entry)
 
 	/*
 	 * Finished with this cache entry, once the usage count reaches zero it
- 	 * can be reused.
+         * can be reused.
 	 *
 	 * If noshrink_lookup is set, put the block onto the free list.
- 	 * As blocks remain accessible via the hash table they can be found
- 	 * getting a new lease of life before they are reused.
+         * As blocks remain accessible via the hash table they can be found
+         * getting a new lease of life before they are reused.
 	 *
 	 * if noshrink_lookup is not set then shrink the cache.
 	 */

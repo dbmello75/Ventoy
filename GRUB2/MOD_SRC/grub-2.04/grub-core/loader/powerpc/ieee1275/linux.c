@@ -123,7 +123,7 @@ grub_linux_claimmap_iterate (grub_addr_t target, grub_size_t size,
 	return addr;
       return (grub_addr_t) -1;
     }
-	
+
 
   grub_machine_mmap_iterate (alloc_mem, &ctx);
 

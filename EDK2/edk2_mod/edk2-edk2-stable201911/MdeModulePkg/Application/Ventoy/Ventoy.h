@@ -438,4 +438,3 @@ EFI_STATUS ventoy_lock_res(UINT8 LockType);
 EFI_STATUS ventoy_unlock_res(VOID);
 
 #endif
-

@@ -160,4 +160,3 @@ Notes about shared libraries
     every time you upgrade to a newer version of XZ Embedded. There are
     no API or ABI stability guarantees between different versions of
     XZ Embedded.
-

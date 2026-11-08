@@ -413,11 +413,11 @@ out:
 
 static int Ventoy_CLI_Install(PHY_DRIVE_INFO* pDrvInfo, CLI_CFG *pCfg)
 {
-    int rc; 
-    int TryId = 1;    
+    int rc;
+    int TryId = 1;
 
     Log("Ventoy_CLI_Install start ...");
-    
+
     if (pDrvInfo->BytesPerLogicalSector == 4096 && pDrvInfo->BytesPerPhysicalSector == 4096)
     {
         Log("Ventoy does not support 4k native disk.");
@@ -465,9 +465,9 @@ out:
 
 static int Ventoy_CLI_Update(PHY_DRIVE_INFO* pDrvInfo, CLI_CFG* pCfg)
 {
-    int rc; 
+    int rc;
     int TryId = 1;
-    
+
     Log("Ventoy_CLI_Update start ...");
 
     rc = UpdateVentoy2PhyDrive(pDrvInfo, TryId++);

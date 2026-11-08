@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,7 +44,7 @@ static uint64_t g_fatlib_media_offset = 0;
 static UDisksClient *client;
 GArray *disks = NULL;
 
-// static const char *g_ventoy_dev_type_str[VTOY_DEVICE_END] = 
+// static const char *g_ventoy_dev_type_str[VTOY_DEVICE_END] =
 // {
 //     "unknown", "scsi", "USB", "ide", "dac960",
 //     "cpqarray", "file", "ataraid", "i2o",
@@ -76,7 +76,7 @@ int get_disks_len()
  */
 ventoy_disk *disks_get_by_name(const char *diskname)
 {
-   
+
     if (!disks) return NULL;
     for (int i = 0; i < disks->len; i++)
     {
@@ -93,7 +93,7 @@ ventoy_disk *disks_get_by_name(const char *diskname)
 
 int ventoy_disk_open(ventoy_disk *disk, const char *mode, int flags)
 {
-    
+
     GVariant *options;
 
     {
@@ -109,7 +109,7 @@ int ventoy_disk_open(ventoy_disk *disk, const char *mode, int flags)
 
     GVariant *out_fd = NULL;
     GUnixFDList *out_fd_list = NULL;
-    
+
     GError *error = NULL;
     udisks_block_call_open_device_sync(disk->blockdev,
                                        mode,
@@ -121,7 +121,7 @@ int ventoy_disk_open(ventoy_disk *disk, const char *mode, int flags)
                                        &error);
 
     g_variant_unref(options);
-    
+
     if (error != NULL)
     {
         vlog("Failed to open device: %s\n", error->message);
@@ -172,7 +172,7 @@ static int ventoy_check_blk_major(int major, const char *type)
                 {
                     if (strncmp(pos + 1, type, len) == 0)
                     {
-                        valid = 1;                        
+                        valid = 1;
                     }
                     break;
                 }
@@ -209,7 +209,7 @@ int ventoy_is_disk_4k_native(ventoy_disk *disk)
 
     ioctl(fd, BLKSSZGET, &logsector);
     ioctl(fd, BLKPBSZGET, &physector);
-    
+
     if (logsector == 4096 && physector == 4096)
     {
         rc = 1;
@@ -239,14 +239,14 @@ static int fatlib_media_sector_read(uint32 sector, uint8 *buffer, uint32 sector_
 {
     lseek(g_fatlib_media_fd, (sector + g_fatlib_media_offset) * 512ULL, SEEK_SET);
     read(g_fatlib_media_fd, buffer, sector_count * 512);
-    
+
     return 1;
 }
 
 static int fatlib_is_secure_boot_enable(void)
 {
     void *flfile = NULL;
-    
+
     flfile = fl_fopen("/EFI/BOOT/grubx64_real.efi", "rb");
     if (flfile)
     {
@@ -258,7 +258,7 @@ static int fatlib_is_secure_boot_enable(void)
     {
         vlog("/EFI/BOOT/grubx64_real.efi not exist\n");
     }
-    
+
     return 0;
 }
 
@@ -314,7 +314,7 @@ static int fatlib_get_ventoy_version(char *verbuf, int bufsize)
     {
         vdebug("No grub.cfg found\n");
     }
-    
+
     return rc;
 }
 
@@ -333,9 +333,9 @@ int ventoy_get_vtoy_data(ventoy_disk *disk)
     uint64_t part2_sector_count;
     uint64_t preserved_space;
     char name[64] = {0};
-    disk_ventoy_data *vtoy = NULL;    
+    disk_ventoy_data *vtoy = NULL;
     VTOY_GPT_INFO *gpt = NULL;
-    
+
     vtoy = &(disk->vtoydata);
     gpt = &(vtoy->gptinfo);
 
@@ -370,7 +370,7 @@ int ventoy_get_vtoy_data(ventoy_disk *disk)
         vdebug("Invalid mbr magic 0x%x 0x%x\n", gpt->MBR.Byte55, gpt->MBR.ByteAA);
         goto end;
     }
-    
+
     /* step 6: save partitions start/end and preserved space */
     if (strcmp(udisks_partition_table_get_type_(disk->table), "gpt") == 0)
     {
@@ -379,7 +379,7 @@ int ventoy_get_vtoy_data(ventoy_disk *disk)
         /* checks that 2 partitions are present */
         if (gpt->PartTbl[0].StartLBA == 0 || gpt->PartTbl[1].StartLBA == 0)
         {
-            vdebug("NO ventoy efi part layout <%llu %llu>\n", 
+            vdebug("NO ventoy efi part layout <%llu %llu>\n",
                 (_ull)gpt->PartTbl[0].StartLBA,
                 (_ull)gpt->PartTbl[1].StartLBA);
             goto end;
@@ -420,12 +420,12 @@ int ventoy_get_vtoy_data(ventoy_disk *disk)
         part2_sector_count != VTOYEFI_PART_SECTORS ||
         (part1_start_sector + part1_sector_count) != part2_start_sector)
     {
-        vdebug("Not valid ventoy partition layout [%llu %llu] [%llu %llu]\n", 
+        vdebug("Not valid ventoy partition layout [%llu %llu] [%llu %llu]\n",
                part1_start_sector, part1_sector_count, part2_start_sector, part2_sector_count);
         goto end;
     }
 
-    vdebug("ventoy partition layout check OK: [%llu %llu] [%llu %llu]\n", 
+    vdebug("ventoy partition layout check OK: [%llu %llu] [%llu %llu]\n",
                part1_start_sector, part1_sector_count, part2_start_sector, part2_sector_count);
 
     vtoy->ventoy_valid = 1;
@@ -442,7 +442,7 @@ int ventoy_get_vtoy_data(ventoy_disk *disk)
         ret = fatlib_get_ventoy_version(vtoy->ventoy_ver, sizeof(vtoy->ventoy_ver));
         if (ret == 0 && vtoy->ventoy_ver[0])
         {
-            vtoy->secure_boot_flag = fatlib_is_secure_boot_enable();            
+            vtoy->secure_boot_flag = fatlib_is_secure_boot_enable();
         }
         else
         {
@@ -467,7 +467,7 @@ int ventoy_get_vtoy_data(ventoy_disk *disk)
     {
         goto end;
     }
-    
+
     lseek(fd, 2040 * 512, SEEK_SET);
     read(fd, vtoy->rsvdata, sizeof(vtoy->rsvdata));
 
@@ -481,9 +481,9 @@ end:
 
 int ventoy_get_disk_info(ventoy_disk *disk)
 {
-    
-    strcpy(disk->disk_path, udisks_block_get_device(disk->blockdev));
-    strcpy(disk->disk_name, disk->disk_path);
+
+    scnprintf(disk->disk_path, "%s", udisks_block_get_device(disk->blockdev));
+    scnprintf(disk->disk_name, "%s", disk->disk_path);
 
     // ventoy_get_disk_devnum(name, &disk->major, &disk->minor);
     // ventoy_get_disk_vendor(name, vendor, sizeof(vendor));
@@ -491,31 +491,32 @@ int ventoy_get_disk_info(ventoy_disk *disk)
 
     scnprintf(disk->human_readable_size, "%llu GB", (_ull)ventoy_get_human_readable_gb(udisks_block_get_size(disk->blockdev)));
     UDisksDrive *drive = udisks_client_get_drive_for_block(client, disk->blockdev);
+    if (!drive) return 1;
 
     const char *vendor = udisks_drive_get_vendor(drive);
     if (vendor == NULL) vendor = "-";
-    
+
     const char *model = udisks_drive_get_model(drive);
-    if (vendor == NULL) vendor = "-";
+    if (model == NULL) model = "-";
 
     const char *bus = udisks_drive_get_connection_bus(drive);
     if (bus == NULL) bus = "-";
-    
+
     scnprintf(disk->disk_model, "%s %s (%s)", vendor, model, bus);
     g_object_unref(drive);
 
     disk->is4kn = ventoy_is_disk_4k_native(disk);
     if (disk->is4kn < 0) return 1;
-    
+
 
     ventoy_get_vtoy_data(disk);
-    
-    // vdebug("disk:<%s %d:%d> model:<%s> size:%llu (%s)\n", 
+
+    // vdebug("disk:<%s %d:%d> model:<%s> size:%llu (%s)\n",
     //     disk->disk_path, disk->major, disk->minor, disk->disk_model, udisks_block_get_size(disk->blockdev), disk->human_readable_size);
 
     if (disk->vtoydata.ventoy_valid)
     {
-        vdebug("%s Ventoy:<%s> %s secureboot:%d preserve:%llu\n", udisks_block_get_device(disk->blockdev), disk->vtoydata.ventoy_ver, 
+        vdebug("%s Ventoy:<%s> %s secureboot:%d preserve:%llu\n", udisks_block_get_device(disk->blockdev), disk->vtoydata.ventoy_ver,
             disk->vtoydata.partition_style == MBR_PART_STYLE ? "MBR" : "GPT",
             disk->vtoydata.secure_boot_flag, (_ull)(disk->vtoydata.preserved_space));
     }
@@ -581,7 +582,7 @@ int ventoy_disk_enumerate_all(void)
         if (udisks_block_get_device(block) == NULL) continue;
 
         if (udisks_block_get_hint_system(block)) continue;
-        
+
         if (udisks_object_peek_partition(obj) != NULL) continue;  // It must not be a partition
 
         // The block and the drive are not the same object
@@ -592,7 +593,12 @@ int ventoy_disk_enumerate_all(void)
         disk.blockdev = block;
         disk.table = table;
         disk.hint_ignore = udisks_block_get_hint_ignore(block);
-        ventoy_get_disk_info(&disk);//check for error..
+        if (ventoy_get_disk_info(&disk))
+        {
+            g_object_unref(block);
+            if (table) g_object_unref(table);
+            continue;
+        }
 
         g_array_append_val(disks, disk);
     }
@@ -606,14 +612,14 @@ void ventoy_disk_dump(ventoy_disk *cur)
 {
     if (cur->vtoydata.ventoy_valid)
     {
-        vdebug("%s [%s]\tVentoy: %s %s secureboot:%d preserve:%llu\n", 
+        vdebug("%s [%s]\tVentoy: %s %s secureboot:%d preserve:%llu\n",
             udisks_block_get_device(cur->blockdev), cur->human_readable_size,
             cur->vtoydata.ventoy_ver, cur->vtoydata.partition_style == MBR_PART_STYLE ? "MBR" : "GPT",
             cur->vtoydata.secure_boot_flag, (_ull)(cur->vtoydata.preserved_space));
     }
     else
     {
-        vdebug("%s [%s]\tVentoy: NA\n", udisks_block_get_device(cur->blockdev), cur->human_readable_size); 
+        vdebug("%s [%s]\tVentoy: NA\n", udisks_block_get_device(cur->blockdev), cur->human_readable_size);
     }
 }
 
@@ -648,7 +654,7 @@ int ventoy_disk_init(void)
 
     ventoy_disk_enumerate_all();
     ventoy_disk_dump_all();
-    
+
     return 0;
 }
 

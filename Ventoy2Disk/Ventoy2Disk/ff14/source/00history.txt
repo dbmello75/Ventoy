@@ -337,4 +337,3 @@ R0.14 (October 14, 2019)
   Fixed f_readdir() function cannot retrieve long file names in length of FF_MAX_LFN - 1 characters.
   Fixed f_readdir() function returns file names with wrong case conversion. (appeared at R0.12)
   Fixed f_mkfs() function can fail to create exFAT volume in the second partition. (appeared at R0.12)
-

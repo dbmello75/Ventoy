@@ -129,4 +129,3 @@ typedef struct _VTOY_SHIM{
 void calc_sha256(const void *data, UINT64 len, void *output);
 
 #endif
-

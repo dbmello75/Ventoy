@@ -766,15 +766,15 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
   {
       ventoy_bootopt_hook(argc, argv);
       err = grub_create_loader_cmdline (ventoy_linux_argc, ventoy_linux_args,
-    				    linux_args + sizeof (LINUX_IMAGE) - 1,
-    				    cmdline_size,
-    				    GRUB_VERIFY_KERNEL_CMDLINE);  }
+                                    linux_args + sizeof (LINUX_IMAGE) - 1,
+                                    cmdline_size,
+                                    GRUB_VERIFY_KERNEL_CMDLINE);  }
   else
   {
       err = grub_create_loader_cmdline (argc, argv,
-    				    linux_args + sizeof (LINUX_IMAGE) - 1,
-    				    cmdline_size,
-    				    GRUB_VERIFY_KERNEL_CMDLINE);
+                                    linux_args + sizeof (LINUX_IMAGE) - 1,
+                                    cmdline_size,
+                                    GRUB_VERIFY_KERNEL_CMDLINE);
   }
 
   if (err)

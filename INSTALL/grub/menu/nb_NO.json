@@ -71,5 +71,10 @@
     "VTLANG_WIN11_BYPASS_NRO": "Omgå krav om online-konto ved installasjon av Windows 11",
     "VTLANG_LINUX_REMOUNT": "Monter Ventoy-partisjon etter oppstart av Linux",
     "VTLANG_SECONDARY_BOOT_MENU": "Vis sekundær oppstartsmeny",
-    "MENU_STR_XXX": ""
+    "MENU_STR_XXX": "",
+    "VTLANG_WIN_UEFI_RES_LOCK": "Lock the resolution when UEFI boot Windows/WinPE",
+    "VTLANG_UEFI_RES_LOCK_NONE": "None",
+    "VTLANG_UEFI_RES_LOCK_MAX": "Highest",
+    "VTLANG_UEFI_RES_LOCK_1024_768": "Fixed 1024 x 768",
+    "VTLANG_UEFI_RES_LOCK_BE1024_768": "At least 1024 x 768"
 }

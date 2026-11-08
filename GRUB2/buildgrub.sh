@@ -95,4 +95,3 @@ make -j$(nproc) || make
 bash install.sh
 
 cd ../../
-

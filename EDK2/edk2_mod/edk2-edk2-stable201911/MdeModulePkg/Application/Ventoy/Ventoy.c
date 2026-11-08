@@ -1363,4 +1363,3 @@ EFI_STATUS EFIAPI VentoyEfiMain
 
     return EFI_SUCCESS;
 }
-

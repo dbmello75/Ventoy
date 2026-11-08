@@ -1,20 +1,20 @@
 #!/ventoy/busybox/sh
 #************************************************************************************
 # Copyright (c) 2020, longpanda <admin@ventoy.net>
-# 
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
-# 
+#
 #************************************************************************************
 
 VT_RULE_DIR_PREFIX=""
@@ -64,7 +64,7 @@ ventoy_get_udev_conf_path() {
 }
 
 ventoy_add_udev_auto_rule() {
-    VT_RULE_DIR=$(ventoy_get_udev_conf_dir)    
+    VT_RULE_DIR=$(ventoy_get_udev_conf_dir)
     cp -a $VTOY_PATH/hook/default/90-ventoy-auto.rules $VT_RULE_DIR/11-ventoy-auto.rules
     cp -a $VTOY_PATH/hook/default/90-ventoy-auto.rules $VT_RULE_DIR/90-ventoy-auto.rules
     chmod 0644 $VT_RULE_DIR/*ventoy*
@@ -96,7 +96,7 @@ ventoy_add_udev_rule() {
 #
 ventoy_systemd_udevd_work_around() {
     for vtdir in 'lib' 'usr/lib'; do
-    
+
         VTSYSTEMUDEV="$VT_RULE_DIR_PREFIX/$vtdir/systemd/system/systemd-udevd.service"
         if [ -e $VTSYSTEMUDEV ]; then
             if $GREP -q 'SystemCallArchitectures.*native' $VTSYSTEMUDEV; then
@@ -183,11 +183,11 @@ ventoy_iso_scan_check() {
             fi
         fi
     fi
-    
+
     [ $vtCheckOk -eq 1 ]
 }
 
 ventoy_wrapper_dracut_hook() {
     echo "#/bin/sh" > $2
-    echo "$BUSYBOX_PATH/sh $1" >> $2    
+    echo "$BUSYBOX_PATH/sh $1" >> $2
 }

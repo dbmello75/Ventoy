@@ -7,12 +7,12 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
@@ -89,7 +89,7 @@ typedef struct SYSINFO
     int syntax_error;
     int invalid_config;
     int config_save_error;
-        
+
     int language;
     int pathcase;
     char cur_fsname[64];
@@ -203,4 +203,3 @@ char * ventoy_base64_encode(const char *data, int input_length, int *output_leng
 size_t utf8_to_utf16(const unsigned char * utf8, size_t utf8_len, unsigned short* utf16, size_t utf16_len);
 
 #endif /* __VENTOY_UTIL_H__ */
-

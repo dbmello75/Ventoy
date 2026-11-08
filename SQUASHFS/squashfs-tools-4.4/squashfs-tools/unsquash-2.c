@@ -165,7 +165,7 @@ static struct inode *read_inode(unsigned int start_block, unsigned int offset)
 
 	if(bytes == -1)
 		EXIT_UNSQUASH("read_inode: inode table block %lld not found\n",
-			start); 
+			start);
 
 	if(swap) {
 		squashfs_base_inode_header_2 sinode;
@@ -246,7 +246,7 @@ static struct inode *read_inode(unsigned int start_block, unsigned int offset)
 			i.sparse = 0;
 			i.block_ptr = block_ptr + sizeof(*inode);
 			break;
-		}	
+		}
 		case SQUASHFS_SYMLINK_TYPE: {
 			squashfs_symlink_inode_header_2 *inodep =
 				&header.symlink;
@@ -270,8 +270,8 @@ static struct inode *read_inode(unsigned int start_block, unsigned int offset)
 			i.data = inodep->symlink_size;
 			break;
 		}
- 		case SQUASHFS_BLKDEV_TYPE:
-	 	case SQUASHFS_CHRDEV_TYPE: {
+                case SQUASHFS_BLKDEV_TYPE:
+                case SQUASHFS_CHRDEV_TYPE: {
 			squashfs_dev_inode_header_2 *inodep = &header.dev;
 
 			if(swap) {

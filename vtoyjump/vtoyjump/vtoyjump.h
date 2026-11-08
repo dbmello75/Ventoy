@@ -24,7 +24,7 @@
 #define ERROR_VIRTDISK_PROVIDER_NOT_FOUND 0xC0140005
 #endif
 
-#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) 
+#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 
 #define SIZE_1MB   (1024 * 1024)
 #define VENTOY_EFI_PART_SIZE   (32 * SIZE_1MB)
@@ -78,7 +78,7 @@ typedef struct ventoy_windows_data
     UINT8 windows11_bypass_check;
 
     UINT32 auto_install_len;
-    
+
     UINT8 windows11_bypass_nro;
 
     UINT8 reserved[255 - 5];
@@ -86,7 +86,7 @@ typedef struct ventoy_windows_data
     /* auto install script file data ... + auto_install_len */
     /* ...... */
 
-    
+
 }ventoy_windows_data;
 
 

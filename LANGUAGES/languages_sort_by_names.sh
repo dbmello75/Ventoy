@@ -33,7 +33,7 @@ if [[ -z "${FILE}" ]]; then
 fi
 [[ -f "$FILE" ]] || { echo "ERROR: File not found: $FILE" >&2; exit 1; }
 
-TMP="$(mktemp "${FILE##*/}.XXXXXX")"
+TMP="$(mktemp "${FILE}.XXXXXX")"
 trap 'rm -f "$TMP"' EXIT
 
 jq -e 'type=="array" and all(.[]; (type=="object") and (.name|type=="string"))' "$FILE" >/dev/null \

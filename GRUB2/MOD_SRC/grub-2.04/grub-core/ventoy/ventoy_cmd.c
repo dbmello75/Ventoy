@@ -7205,5 +7205,3 @@ int ventoy_unregister_all_cmd(void)
 
     return 0;
 }
-
-

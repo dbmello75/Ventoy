@@ -9,12 +9,12 @@
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
@@ -76,8 +76,8 @@ static int ventoy_load_mbr_template(void)
 
     fread(g_mbr_template, 1, 512, fp);
     fclose(fp);
-    
-    ventoy_gen_preudo_uuid(g_mbr_template + 0x180);    
+
+    ventoy_gen_preudo_uuid(g_mbr_template + 0x180);
     return 0;
 }
 
@@ -117,7 +117,7 @@ static int ventoy_unxz_efipart_img(void)
 
     g_efi_part_offset = 0;
     g_efi_part_raw_img = buf;
-    
+
     rc = unxz(xzbuf, xzlen, NULL, ventoy_disk_xz_flush, buf, &inlen, NULL);
     vdebug("ventoy_unxz_efipart_img len:%d rc:%d unxzlen:%u\n", inlen, rc, g_efi_part_offset);
 
@@ -149,7 +149,7 @@ static int ventoy_unxz_stg1_img(void)
             return 1;
         }
     }
-    
+
     rc = unxz(xzbuf, xzlen, NULL, NULL, buf, &inlen, NULL);
     vdebug("ventoy_unxz_stg1_img len:%d rc:%d\n", inlen, rc);
 
@@ -171,7 +171,7 @@ static int ventoy_http_save_cfg(void)
         return 0;
     }
 
-    fprintf(fp, "[Ventoy]\nLanguage=%s\nPartStyle=%d\nShowAllDevice=%d\n", 
+    fprintf(fp, "[Ventoy]\nLanguage=%s\nPartStyle=%d\nShowAllDevice=%d\n",
         g_cur_language, g_cur_part_style, g_cur_show_all);
 
     fclose(fp);
@@ -205,7 +205,7 @@ static int ventoy_http_load_cfg(void)
                 break;
             }
         }
-    
+
         len = (int)strlen("Language=");
         if (strncmp(line, "Language=", len) == 0)
         {
@@ -230,7 +230,7 @@ static int ventoy_json_result(struct mg_connection *conn, const char *err)
 {
     if (conn)
     {
-        mg_printf(conn, 
+        mg_printf(conn,
                   "HTTP/1.1 200 OK \r\n"
                   "Content-Type: application/json\r\n"
                   "Content-Length: %d\r\n"
@@ -249,12 +249,12 @@ static int ventoy_json_buffer(struct mg_connection *conn, const char *json_buf, 
 {
     if (conn)
     {
-        mg_printf(conn, 
+        mg_printf(conn,
                   "HTTP/1.1 200 OK \r\n"
                   "Content-Type: application/json\r\n"
                   "Content-Length: %d\r\n"
                   "\r\n%s",
-                  json_len, json_buf);    
+                  json_len, json_buf);
     }
     else
     {
@@ -278,7 +278,7 @@ static int ventoy_api_sysinfo(struct mg_connection *conn, VTOY_JSON *json)
     int pos = 0;
     int buflen = 0;
     char buf[512];
-    
+
     (void)json;
 
     busy = (g_current_progress == PT_FINISH) ? 0 : 1;
@@ -306,7 +306,7 @@ static int ventoy_api_get_percent(struct mg_connection *conn, VTOY_JSON *json)
     int buflen = 0;
     int percent = 0;
     char buf[128];
-    
+
     (void)json;
 
     percent = g_current_progress * 100 / PT_FINISH;
@@ -328,7 +328,7 @@ static int ventoy_api_get_percent(struct mg_connection *conn, VTOY_JSON *json)
 static int ventoy_api_set_language(struct mg_connection *conn, VTOY_JSON *json)
 {
     const char *lang = NULL;
-    
+
     lang = vtoy_json_get_string_ex(json, "language");
     if (lang)
     {
@@ -337,26 +337,26 @@ static int ventoy_api_set_language(struct mg_connection *conn, VTOY_JSON *json)
     }
 
     ventoy_json_result(conn, VTOY_JSON_SUCCESS_RET);
-    return 0;    
+    return 0;
 }
 
 static int ventoy_api_set_partstyle(struct mg_connection *conn, VTOY_JSON *json)
 {
     int ret;
     int style = 0;
-    
+
     ret = vtoy_json_get_int(json, "partstyle", &style);
     if (JSON_SUCCESS == ret)
     {
         if ((style == 0) || (style == 1))
         {
             g_cur_part_style = style;
-            ventoy_http_save_cfg();            
+            ventoy_http_save_cfg();
         }
     }
 
     ventoy_json_result(conn, VTOY_JSON_SUCCESS_RET);
-    return 0;    
+    return 0;
 }
 
 static int ventoy_clean_disk(int fd, uint64_t size)
@@ -365,7 +365,7 @@ static int ventoy_clean_disk(int fd, uint64_t size)
     ssize_t len;
     off_t offset;
     void *buf = NULL;
-    
+
     vdebug("ventoy_clean_disk fd:%d size:%llu\n", fd, (_ull)size);
 
     zerolen = 64 * 1024;
@@ -394,7 +394,7 @@ static int ventoy_write_legacy_grub(int fd, int partstyle)
 {
     ssize_t len;
     off_t offset;
-    
+
     if (partstyle)
     {
         vlog("Write GPT stage1 ...\n");
@@ -416,7 +416,7 @@ static int ventoy_write_legacy_grub(int fd, int partstyle)
         vlog("Write MBR stage1 ...\n");
         offset = lseek(fd, 512, SEEK_SET);
         len = write(fd, g_grub_stg1_raw_img, SIZE_1MB - 512);
-        
+
         vlog("lseek offset:%llu(%u) writelen:%llu(%u)\n", (_ull)offset, 512, (_ull)len, SIZE_1MB - 512);
         if (SIZE_1MB - 512 != len)
         {
@@ -464,7 +464,7 @@ static int VentoyProcSecureBoot(int SecureBoot)
 	void *file = NULL;
 
 	vlog("VentoyProcSecureBoot %d ...\n", SecureBoot);
-	
+
 	if (SecureBoot)
 	{
 		vlog("Secure boot is enabled ...\n");
@@ -509,7 +509,7 @@ static int VentoyProcSecureBoot(int SecureBoot)
 				{
 					fl_fwrite(filebuf, 1, size, file);
 				}
-				
+
 				fl_fflush(file);
 				fl_fclose(file);
 			}
@@ -542,7 +542,7 @@ static int VentoyProcSecureBoot(int SecureBoot)
             fl_remove("/EFI/BOOT/BOOTIA32.EFI");
             fl_remove("/EFI/BOOT/grubia32.efi");
             fl_remove("/EFI/BOOT/grubia32_real.efi");
-            fl_remove("/EFI/BOOT/mmia32.efi");            
+            fl_remove("/EFI/BOOT/mmia32.efi");
 
             file = fl_fopen("/EFI/BOOT/BOOTIA32.EFI", "wb");
             vlog("Open bootia32 efi file %p\n", file);
@@ -585,7 +585,7 @@ static int ventoy_check_efi_part_data(int fd, uint64_t offset)
     {
         return 0;
     }
-    
+
     lseek(fd, offset, SEEK_SET);
     for (i = 0; i < 32; i++)
     {
@@ -606,7 +606,7 @@ static int ventoy_write_efipart(int fd, uint64_t offset, uint32_t secureboot)
 {
     int i;
     ssize_t len;
-    
+
     vlog("Formatting part2 EFI offset:%llu ...\n", (_ull)offset);
     lseek(fd, offset, SEEK_SET);
 
@@ -616,15 +616,15 @@ static int ventoy_write_efipart(int fd, uint64_t offset, uint32_t secureboot)
     for (i = 0; i < 32; i++)
     {
         len = write(fd, g_efi_part_raw_img + i * SIZE_1MB, SIZE_1MB);
-        vlog("write disk writelen:%lld datalen:%d [ %s ]\n", 
+        vlog("write disk writelen:%lld datalen:%d [ %s ]\n",
             (_ll)len, SIZE_1MB, (len == SIZE_1MB) ? "success" : "failed");
-        
+
         if (len != SIZE_1MB)
         {
             vlog("failed to format part2 EFI\n");
             return 1;
         }
-    
+
         g_current_progress = PT_WRITE_VENTOY_START + i / 4;
     }
 
@@ -640,7 +640,7 @@ static int VentoyFillBackupGptHead(VTOY_GPT_INFO *pInfo, VTOY_GPT_HDR *pHead)
 
     LBA = pHead->EfiStartLBA;
     BackupLBA = pHead->EfiBackupLBA;
-    
+
     pHead->EfiStartLBA = BackupLBA;
     pHead->EfiBackupLBA = LBA;
     pHead->PartTblStartLBA = BackupLBA + 1 - 33;
@@ -656,7 +656,7 @@ static int ventoy_write_gpt_part_table(int fd, uint64_t disksize, VTOY_GPT_INFO 
     ssize_t len;
     off_t offset;
     VTOY_GPT_HDR BackupHead;
-    
+
     VentoyFillBackupGptHead(gpt, &BackupHead);
 
     offset = lseek(fd, disksize - 512, SEEK_SET);
@@ -674,7 +674,7 @@ static int ventoy_write_gpt_part_table(int fd, uint64_t disksize, VTOY_GPT_INFO 
     {
         return 1;
     }
-    
+
     offset = lseek(fd, 0, SEEK_SET);
     len = write(fd, gpt, sizeof(VTOY_GPT_INFO));
     vlog("write gpt part head off:%llu len:%llu\n", (_ull)offset, (_ull)len);
@@ -682,7 +682,7 @@ static int ventoy_write_gpt_part_table(int fd, uint64_t disksize, VTOY_GPT_INFO 
     {
         return 1;
     }
-    
+
     return 0;
 }
 
@@ -694,12 +694,12 @@ static int ventoy_mbr_need_update(ventoy_disk *disk, MBR_HEAD *mbr)
 
     partition_style = disk->vtoydata.partition_style;
     memcpy(mbr, &(disk->vtoydata.gptinfo.MBR), 512);
-    
+
     VentoyGetLocalBootImg(&LocalMBR);
     memcpy(LocalMBR.BootCode + 0x180, mbr->BootCode + 0x180, 16);
     if (partition_style)
     {
-        LocalMBR.BootCode[92] = 0x22;        
+        LocalMBR.BootCode[92] = 0x22;
     }
 
     if (memcmp(LocalMBR.BootCode, mbr->BootCode, 440))
@@ -757,7 +757,7 @@ static void * ventoy_update_thread(void *data)
 
     g_current_progress = PT_LOAD_CORE_IMG;
     ventoy_unxz_stg1_img();
-    
+
     g_current_progress = PT_LOAD_DISK_IMG;
     ventoy_unxz_efipart_img();
 
@@ -794,26 +794,26 @@ static void * ventoy_update_thread(void *data)
         vlog("No need to update MBR\n");
     }
 
-    
+
     if (disk->vtoydata.partition_style)
     {
         pstGPT = (VTOY_GPT_INFO *)malloc(sizeof(VTOY_GPT_INFO));
         memset(pstGPT, 0, sizeof(VTOY_GPT_INFO));
-            
+
         offset = lseek(fd, 0, SEEK_SET);
         len = read(fd, pstGPT, sizeof(VTOY_GPT_INFO));
         vlog("Read GPT table offset:%llu len:%llu ...\n", (_ull)offset, (_ull)len);
 
         if (pstGPT->PartTbl[1].Attr != 0x8000000000000000ULL)
         {
-            vlog("Update EFI part attr from 0x%016llx to 0x%016llx\n", 
+            vlog("Update EFI part attr from 0x%016llx to 0x%016llx\n",
                  pstGPT->PartTbl[1].Attr, 0x8000000000000000ULL);
 
             pstGPT->PartTbl[1].Attr = 0x8000000000000000ULL;
 
             pstGPT->Head.PartTblCrc = ventoy_crc32(pstGPT->PartTbl, sizeof(pstGPT->PartTbl));
             pstGPT->Head.Crc = 0;
-            pstGPT->Head.Crc = ventoy_crc32(&(pstGPT->Head), pstGPT->Head.Length);            
+            pstGPT->Head.Crc = ventoy_crc32(&(pstGPT->Head), pstGPT->Head.Length);
             ventoy_write_gpt_part_table(fd, disk->size_in_byte, pstGPT);
         }
         else
@@ -822,7 +822,7 @@ static void * ventoy_update_thread(void *data)
         }
         free(pstGPT);
     }
-    
+
 
     g_current_progress = PT_SYNC_DATA1;
 
@@ -839,13 +839,13 @@ static void * ventoy_update_thread(void *data)
 
 err:
     g_cur_process_result = 1;
-    vtoy_safe_close_fd(fd);        
+    vtoy_safe_close_fd(fd);
 
 end:
     g_current_progress = PT_FINISH;
 
     check_free(thread);
-    
+
     return NULL;
 }
 
@@ -887,10 +887,10 @@ static void * ventoy_install_thread(void *data)
 
     g_current_progress = PT_DEL_ALL_PART;
     ventoy_clean_disk(fd, disk->size_in_byte);
-    
+
     g_current_progress = PT_LOAD_CORE_IMG;
     ventoy_unxz_stg1_img();
-    
+
     g_current_progress = PT_LOAD_DISK_IMG;
     ventoy_unxz_efipart_img();
 
@@ -912,7 +912,7 @@ static void * ventoy_install_thread(void *data)
         Part2StartSector = MBR.PartTbl[1].StartSectorId;
     }
 
-    vlog("Part1StartSector:%llu Part1SectorCount:%llu Part2StartSector:%llu\n", 
+    vlog("Part1StartSector:%llu Part1SectorCount:%llu Part2StartSector:%llu\n",
         (_ull)Part1StartSector, (_ull)Part1SectorCount, (_ull)Part2StartSector);
 
     if (thread->partstyle != disk->partstyle)
@@ -971,7 +971,7 @@ static void * ventoy_install_thread(void *data)
     }
 
     vtoy_safe_close_fd(fd);
-    
+
     /* reopen for write part table */
     g_current_progress = PT_WRITE_PART_TABLE;
     vlog("Writting Partition Table style:%d...\n", thread->partstyle);
@@ -1011,14 +1011,14 @@ static void * ventoy_install_thread(void *data)
 
 err:
     g_cur_process_result = 1;
-    vtoy_safe_close_fd(fd);        
+    vtoy_safe_close_fd(fd);
 
 end:
     g_current_progress = PT_FINISH;
 
     check_free(gpt);
     check_free(thread);
-    
+
     return NULL;
 }
 
@@ -1029,13 +1029,13 @@ static int ventoy_api_clean(struct mg_connection *conn, VTOY_JSON *json)
     ventoy_disk *disk = NULL;
     const char *diskname = NULL;
     char path[128];
-    
+
     if (g_current_progress != PT_FINISH)
     {
         ventoy_json_result(conn, VTOY_JSON_BUSY_RET);
-        return 0;  
+        return 0;
     }
-    
+
     diskname = vtoy_json_get_string_ex(json, "disk");
     if (diskname == NULL)
     {
@@ -1097,12 +1097,12 @@ static int ventoy_api_clean(struct mg_connection *conn, VTOY_JSON *json)
     }
 
     vdebug("start clean %s ...\n", disk->disk_model);
-    ventoy_clean_disk(fd, disk->size_in_byte);    
+    ventoy_clean_disk(fd, disk->size_in_byte);
 
     vtoy_safe_close_fd(fd);
-    
+
     ventoy_json_result(conn, VTOY_JSON_SUCCESS_RET);
-    return 0;    
+    return 0;
 }
 
 static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
@@ -1119,13 +1119,13 @@ static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
     const char *reserve_space = NULL;
     ventoy_thread_data *thread = NULL;
     char path[128];
-    
+
     if (g_current_progress != PT_FINISH)
     {
         ventoy_json_result(conn, VTOY_JSON_BUSY_RET);
-        return 0;  
+        return 0;
     }
-    
+
     diskname = vtoy_json_get_string_ex(json, "disk");
     reserve_space = vtoy_json_get_string_ex(json, "reserve_space");
     ret += vtoy_json_get_uint(json, "partstyle", &style);
@@ -1224,7 +1224,7 @@ static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
         ventoy_json_result(conn, VTOY_JSON_FAILED_RET);
         return 0;
     }
-    
+
     g_current_progress = PT_START;
     g_cur_process_result = 0;
     scnprintf(g_cur_process_type, "%s", "install");
@@ -1236,11 +1236,11 @@ static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
     thread->partstyle = style;
     thread->secure_boot = secure_boot;
     thread->reserveBytes = reserveBytes;
-    
+
     mg_start_thread(ventoy_install_thread, thread);
-    
+
     ventoy_json_result(conn, VTOY_JSON_SUCCESS_RET);
-    return 0;    
+    return 0;
 }
 
 static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
@@ -1253,13 +1253,13 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
     const char *diskname = NULL;
     ventoy_thread_data *thread = NULL;
     char path[128];
-    
+
     if (g_current_progress != PT_FINISH)
     {
         ventoy_json_result(conn, VTOY_JSON_BUSY_RET);
-        return 0;  
+        return 0;
     }
-    
+
     diskname = vtoy_json_get_string_ex(json, "disk");
     ret += vtoy_json_get_uint(json, "secure_boot", &secure_boot);
     if (diskname == NULL || ret != JSON_SUCCESS)
@@ -1303,8 +1303,8 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
     vlog("===== ventoy update %s new_secureboot:%u =========\n", disk->disk_path, secure_boot);
     vlog("==========================================================\n");
 
-    vlog("%s version:%s partstyle:%u oldsecureboot:%u reserve:%llu\n", 
-        disk->disk_path, disk->vtoydata.ventoy_ver, 
+    vlog("%s version:%s partstyle:%u oldsecureboot:%u reserve:%llu\n",
+        disk->disk_path, disk->vtoydata.ventoy_ver,
         disk->vtoydata.partition_style,
         disk->vtoydata.secure_boot_flag,
         (_ull)(disk->vtoydata.preserved_space)
@@ -1344,7 +1344,7 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
         ventoy_json_result(conn, VTOY_JSON_FAILED_RET);
         return 0;
     }
-    
+
     g_current_progress = PT_START;
     g_cur_process_result = 0;
     scnprintf(g_cur_process_type, "%s", "update");
@@ -1353,11 +1353,11 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
     thread->disk = disk;
     thread->diskfd = fd;
     thread->secure_boot = secure_boot;
-    
+
     mg_start_thread(ventoy_update_thread, thread);
-    
+
     ventoy_json_result(conn, VTOY_JSON_SUCCESS_RET);
-    return 0;    
+    return 0;
 }
 
 
@@ -1384,7 +1384,7 @@ static int ventoy_api_get_dev_list(struct mg_connection *conn, VTOY_JSON *json)
     uint32_t alldev = 0;
     char *buf = NULL;
     ventoy_disk *cur = NULL;
-    
+
     rc = vtoy_json_get_uint(json, "alldev", &alldev);
     if (JSON_SUCCESS != rc)
     {
@@ -1412,7 +1412,7 @@ static int ventoy_api_get_dev_list(struct mg_connection *conn, VTOY_JSON *json)
         {
             continue;
         }
-        
+
         VTOY_JSON_FMT_OBJ_BEGIN();
         VTOY_JSON_FMT_STRN("name", cur->disk_name);
         VTOY_JSON_FMT_STRN("model", cur->disk_model);
@@ -1423,7 +1423,7 @@ static int ventoy_api_get_dev_list(struct mg_connection *conn, VTOY_JSON *json)
         VTOY_JSON_FMT_UINT("vtoy_partstyle", cur->vtoydata.partition_style);
         VTOY_JSON_FMT_OBJ_ENDEX();
     }
-    
+
     VTOY_JSON_FMT_ARY_END();
     VTOY_JSON_FMT_OBJ_END();
     VTOY_JSON_FMT_END(pos);
@@ -1432,7 +1432,7 @@ static int ventoy_api_get_dev_list(struct mg_connection *conn, VTOY_JSON *json)
     return 0;
 }
 
-static JSON_CB g_ventoy_json_cb[] = 
+static JSON_CB g_ventoy_json_cb[] =
 {
     { "sysinfo",        ventoy_api_sysinfo        },
     { "sel_language",   ventoy_api_set_language   },
@@ -1523,8 +1523,8 @@ static int ventoy_request_handler(struct mg_connection *conn)
     char *post_data_buf = NULL;
     const struct mg_request_info *ri = NULL;
     char stack_buf[512];
-    
-    ri = mg_get_request_info(conn);    
+
+    ri = mg_get_request_info(conn);
 
     if (strcmp(ri->uri, "/vtoy/json") == 0)
     {
@@ -1538,7 +1538,7 @@ static int ventoy_request_handler(struct mg_connection *conn)
             post_data_buf = stack_buf;
             post_buf_len = sizeof(stack_buf);
         }
-        
+
         post_data_len = mg_read(conn, post_data_buf, post_buf_len);
         post_data_buf[post_data_len] = 0;
 
@@ -1573,7 +1573,7 @@ int ventoy_http_start(const char *ip, const char *port)
     uint8_t uuid[16];
     char addr[128];
     struct mg_callbacks callbacks;
-    const char *options[] = 
+    const char *options[] =
     {
 	    "listening_ports",    "24680",
         "document_root",      "WebUI",
@@ -1603,7 +1603,7 @@ int ventoy_http_stop(void)
 {
     if (g_ventoy_http_ctx)
     {
-        mg_stop(g_ventoy_http_ctx);        
+        mg_stop(g_ventoy_http_ctx);
     }
     return 0;
 }
@@ -1615,7 +1615,7 @@ int ventoy_http_init(void)
     ventoy_http_load_cfg();
 
     ventoy_load_mbr_template();
-    
+
     return 0;
 }
 
@@ -1624,7 +1624,7 @@ void ventoy_http_exit(void)
     pthread_mutex_destroy(&g_api_mutex);
 
     check_free(g_efi_part_raw_img);
-    g_efi_part_raw_img = NULL;    
+    g_efi_part_raw_img = NULL;
 }
 
 
@@ -1641,7 +1641,7 @@ int ventoy_code_get_cur_part_style(void)
 void ventoy_code_set_cur_part_style(int style)
 {
     pthread_mutex_lock(&g_api_mutex);
-    
+
     g_cur_part_style = style;
     ventoy_http_save_cfg();
 
@@ -1656,7 +1656,7 @@ int ventoy_code_get_cur_show_all(void)
 void ventoy_code_set_cur_show_all(int show_all)
 {
     pthread_mutex_lock(&g_api_mutex);
-    
+
     g_cur_show_all = show_all;
     ventoy_http_save_cfg();
 
@@ -1666,10 +1666,10 @@ void ventoy_code_set_cur_show_all(int show_all)
 void ventoy_code_set_cur_language(const char *lang)
 {
     pthread_mutex_lock(&g_api_mutex);
-    
+
     scnprintf(g_cur_language, "%s", lang);
     ventoy_http_save_cfg();
-    
+
     pthread_mutex_unlock(&g_api_mutex);
 }
 

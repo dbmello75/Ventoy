@@ -29,7 +29,7 @@ rm -f $DST_PATH
 unset WORKSPACE
 source ./edksetup.sh
 
-if [ "$EDKARCH" = "AARCH64" ]; then    
+if [ "$EDKARCH" = "AARCH64" ]; then
     PATH=$PATH:/opt/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu/bin \
     GCC48_AARCH64_PREFIX=aarch64-linux-gnu- \
     build -p MdeModulePkg/MdeModulePkg.dsc -a $EDKARCH -b RELEASE -t GCC48  -m MdeModulePkg/Application/VtoyShim/VtoyShim.inf
@@ -49,25 +49,25 @@ if [ -e $VTEFI_PATH ]; then
 
     #find the right sbat section VMA
     tmpfile=$(mktemp)
-    
+
     cnt1=$(objdump -h "$DST_PATH" | grep -P '^\s*[0-9][0-9]* \.' | wc -l)
     cnt2=$(objdump -h "$DST_PATH" | grep -P 'ALLOC' | wc -l)
-    
+
     if [ $cnt1 -ne $cnt2 ]; then
         echo "Section count mismatch $cnt1 $cnt2"
         objdump -h "$DST_PATH"
         exit 1
     fi
 
-    objdump -h "$DST_PATH" | grep -P '^\s*[0-9][0-9]* \.' > $tmpfile    
-    sbat_size=$(stat -c '%s' MdeModulePkg/Application/VtoyShim/sbat.csv)    
+    objdump -h "$DST_PATH" | grep -P '^\s*[0-9][0-9]* \.' > $tmpfile
+    sbat_size=$(stat -c '%s' MdeModulePkg/Application/VtoyShim/sbat.csv)
     sbat_size_hex=$(printf '0x%08x' $sbat_size)
-    
+
     lmax='0000000000000000'
     lsize='0000000000000000'
     while read line; do
-        echo $line        
-        lbase=$(echo $line | awk '{print $4}')        
+        echo $line
+        lbase=$(echo $line | awk '{print $4}')
         if expr "$lmax" \< "$lbase" > /dev/null; then
             lmax=$lbase
             lsize=$(echo $line | awk '{print $3}')
@@ -79,8 +79,8 @@ if [ -e $VTEFI_PATH ]; then
 
     lvma=$((0x${lsize}+0x${lmax}))
     lvma_align=`printf '0x%08x' $(( (lvma + 4095) / 4096 * 4096 ))`
-    echo "sbat section lvma_align=$lvma_align"    
-    
+    echo "sbat section lvma_align=$lvma_align"
+
     objcopy --adjust-section-vma .sbat=$lvma_align "$DST_PATH"
 
     img_base=$(objdump -p "$DST_PATH" | grep ImageBase | awk '{print $2}')
@@ -91,8 +91,8 @@ if [ -e $VTEFI_PATH ]; then
         echo "#### ImageBase is not 0 $img_base"
         exit 1
     fi
-    
-    echo "size_img=$size_img  sbat_size=$sbat_size_hex sbat_range $lvma_align - $sbat_end"    
+
+    echo "size_img=$size_img  sbat_size=$sbat_size_hex sbat_range $lvma_align - $sbat_end"
 
     if expr "$size_img" \< "$sbat_end" > /dev/null; then
         echo "SizeOfImage $size_img less than sbat section addr $sbat_end"
@@ -103,7 +103,7 @@ if [ -e $VTEFI_PATH ]; then
 
     objdump -h "$DST_PATH"
 
-    echo -e '\n\n====================== SUCCESS ========================\n\n'    
+    echo -e '\n\n====================== SUCCESS ========================\n\n'
 
     cd ..
 else
@@ -111,4 +111,3 @@ else
     cd ..
     exit 1
 fi
-

@@ -24,4 +24,3 @@ else
 fi
 
 strip --strip-all $name
-

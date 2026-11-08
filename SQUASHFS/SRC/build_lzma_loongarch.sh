@@ -18,5 +18,3 @@ if [ -d $LIBDIR ]; then
 else
     echo -e "\n========== FAILED ============\n"
 fi
-
-

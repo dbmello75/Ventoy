@@ -425,4 +425,3 @@ fi
 rm -f log.txt
 rm -f sha256.txt
 sha256sum ventoy-${curver}-* > sha256.txt
-

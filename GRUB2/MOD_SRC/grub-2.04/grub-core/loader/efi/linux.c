@@ -183,11 +183,11 @@ static void ventoy_debug_pause(void)
 {
     char key;
 
-    if (0 == ventoy_debug) 
+    if (0 == ventoy_debug)
     {
         return;
     }
-    
+
     grub_printf("press Enter to continue ......\n");
     while (1)
     {
@@ -196,7 +196,7 @@ static void ventoy_debug_pause(void)
         {
             break;
         }
-    }    
+    }
 }
 
 static int ventoy_preboot(void)
@@ -205,7 +205,7 @@ static int ventoy_preboot(void)
     const char *file;
     char buf[128];
 
-    if (ventoy_debug) 
+    if (ventoy_debug)
     {
         grub_printf("ventoy_preboot %d %d\n", ventoy_linux_argc, ventoy_initrd_called);
         ventoy_debug_pause();
@@ -232,7 +232,7 @@ static int ventoy_preboot(void)
         ventoy_extra_initrd_list[ventoy_extra_initrd_num++] = grub_strdup(file);
     }
 
-    if (ventoy_debug) 
+    if (ventoy_debug)
     {
         grub_printf("========== initrd list ==========\n");
         for (i = 0; i < ventoy_extra_initrd_num; i++)
@@ -240,7 +240,7 @@ static int ventoy_preboot(void)
             grub_printf("%s\n", ventoy_extra_initrd_list[i]);
         }
         grub_printf("=================================\n");
-        
+
         ventoy_debug_pause();
     }
 
@@ -270,14 +270,14 @@ static int ventoy_boot_opt_filter(char *opt)
         }
         return 0;
     }
-    
+
     if (grub_strncmp(opt, "init=", 5) == 0)
     {
         opt[0] = 'v';
         opt[1] = 't';
         return 0;
     }
-    
+
     if (grub_strncmp(opt, "dm=", 3) == 0)
     {
         opt[0] = 'D';
@@ -291,12 +291,12 @@ static int ventoy_boot_opt_filter(char *opt)
         {
             return 1;
         }
-        
+
         if (grub_strncmp(opt, "loglevel=", 9) == 0)
         {
             return 1;
         }
-        
+
         if (grub_strcmp(opt, "splash") == 0)
         {
             return 1;
@@ -343,7 +343,7 @@ static int ventoy_bootopt_hook(int argc, char *argv[])
     {
         ventoy_linux_args[count] = ventoy_linux_args[i + (LINUX_MAX_ARGC / 2)];
         ventoy_linux_args[i + (LINUX_MAX_ARGC / 2)] = NULL;
-        
+
         if (ventoy_linux_args[count][0] == '@')
         {
             env = grub_env_get(ventoy_linux_args[count] + 1);
@@ -389,7 +389,7 @@ static int ventoy_bootopt_hook(int argc, char *argv[])
                     {
                         if (0 == ventoy_boot_opt_filter(last))
                         {
-                            ventoy_linux_args[count++] = grub_strdup(last);                            
+                            ventoy_linux_args[count++] = grub_strdup(last);
                         }
                         break;
                     }
@@ -404,7 +404,7 @@ static int ventoy_bootopt_hook(int argc, char *argv[])
         }
         else
         {
-            count++;            
+            count++;
         }
     }
 
@@ -432,10 +432,10 @@ static int ventoy_bootopt_hook(int argc, char *argv[])
         for (i = 0; i < count; i++)
         {
             grub_printf("%s ", ventoy_linux_args[i]);
-        }  
+        }
         grub_printf("\n================================\n");
     }
-    
+
     return 0;
 }
 
@@ -468,7 +468,7 @@ grub_cmd_unset_boot_opt (grub_command_t cmd __attribute__ ((unused)),
 		int argc, char *argv[])
 {
     int i;
-    
+
     (void)argc;
     (void)argv;
 
@@ -495,7 +495,7 @@ grub_cmd_extra_initrd_append (grub_command_t cmd __attribute__ ((unused)),
     char *pos = NULL;
     char *end = NULL;
     char buf[256] = {0};
-    
+
     if (argc != 1)
     {
         return 1;
@@ -521,10 +521,10 @@ grub_cmd_extra_initrd_append (grub_command_t cmd __attribute__ ((unused)),
         {
             grub_snprintf(buf, sizeof(buf), "newc:%s:%s", end + 1, argv[0]);
         }
-    
+
         if (ventoy_extra_initrd_num < 256)
         {
-            ventoy_extra_initrd_list[ventoy_extra_initrd_num++] = grub_strdup(buf);        
+            ventoy_extra_initrd_list[ventoy_extra_initrd_num++] = grub_strdup(buf);
         }
     }
 
@@ -536,7 +536,7 @@ grub_cmd_extra_initrd_reset (grub_command_t cmd __attribute__ ((unused)),
 		int argc, char *argv[])
 {
     int i;
-    
+
     (void)argc;
     (void)argv;
 
@@ -735,15 +735,15 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
   {
       ventoy_bootopt_hook(argc, argv);
       err = grub_create_loader_cmdline (ventoy_linux_argc, ventoy_linux_args,
-    				    linux_args + sizeof (LINUX_IMAGE) - 1,
-    				    cmdline_size,
-    				    GRUB_VERIFY_KERNEL_CMDLINE);  }
+                                    linux_args + sizeof (LINUX_IMAGE) - 1,
+                                    cmdline_size,
+                                    GRUB_VERIFY_KERNEL_CMDLINE);  }
   else
-  {      
+  {
       err = grub_create_loader_cmdline (argc, argv,
-    				    linux_args + sizeof (LINUX_IMAGE) - 1,
-    				    cmdline_size,
-    				    GRUB_VERIFY_KERNEL_CMDLINE);
+                                    linux_args + sizeof (LINUX_IMAGE) - 1,
+                                    cmdline_size,
+                                    GRUB_VERIFY_KERNEL_CMDLINE);
   }
 
   if (err)
@@ -787,7 +787,7 @@ ventoy_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
 
     if (ventoy_linux_argc == 0)
     {
-        return grub_cmd_initrd(cmd, argc, argv);        
+        return grub_cmd_initrd(cmd, argc, argv);
     }
 
     grub_snprintf(buf, sizeof(buf), "mem:%s:size:%s", grub_env_get("ventoy_cpio_addr"), grub_env_get("ventoy_cpio_size"));
@@ -818,7 +818,7 @@ ventoy_cmd_initrd (grub_command_t cmd __attribute__ ((unused)),
         }
         grub_printf("=================================\n");
     }
-    
+
     return grub_cmd_initrd(cmd, ventoy_extra_initrd_num, ventoy_extra_initrd_list);
 }
 
@@ -841,12 +841,12 @@ GRUB_MOD_INIT (linux)
 
   cmd_set_bootopt = grub_register_command ("vt_set_boot_opt", grub_cmd_set_boot_opt, 0, N_("set ext boot opt"));
   cmd_unset_bootopt = grub_register_command ("vt_unset_boot_opt", grub_cmd_unset_boot_opt, 0, N_("unset ext boot opt"));
-  
+
   cmd_extra_initrd_append = grub_register_command ("vt_img_extra_initrd_append", grub_cmd_extra_initrd_append, 0, N_(""));
   cmd_extra_initrd_reset = grub_register_command ("vt_img_extra_initrd_reset", grub_cmd_extra_initrd_reset, 0, N_(""));
 
   ventoy_linux_args = grub_zalloc(sizeof(char *) * LINUX_MAX_ARGC);
-                      
+
   my_mod = mod;
 }
 

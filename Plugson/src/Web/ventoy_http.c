@@ -1,3 +1,4 @@
+#include "ventoy_locale_list.h"
 /******************************************************************************
  * ventoy_http.c  ---- ventoy http
  * Copyright (c) 2021, longpanda <admin@ventoy.net>
@@ -5459,11 +5460,7 @@ int ventoy_http_init(void)
     ventoy_read_file_to_buf("www/menulist", 4, (void **)&Buffer, &BufLen);
     if (Buffer)
     {
-        for (i = 0; i < BufLen / 5; i++)
-        {
-            memcpy(g_ventoy_menu_lang[i], Buffer + i * 5, 5);
-            g_ventoy_menu_lang[i][5] = 0;
-        }
+        ventoy_parse_locale_list(Buffer, (size_t)BufLen, g_ventoy_menu_lang, MAX_LANGUAGE);
         free(Buffer);
     }
 #else
@@ -5472,11 +5469,7 @@ int ventoy_http_init(void)
     file = ventoy_tar_find_file("www/menulist");
     if (file)
     {
-        for (i = 0; i < file->size / 5; i++)
-        {
-            memcpy(g_ventoy_menu_lang[i], (char *)(file->addr) + i * 5, 5);
-            g_ventoy_menu_lang[i][5] = 0;
-        }
+        ventoy_parse_locale_list((char *)file->addr, file->size, g_ventoy_menu_lang, MAX_LANGUAGE);
     }
 #endif
 
@@ -5499,5 +5492,3 @@ void ventoy_http_exit(void)
 
     pthread_mutex_destroy(&g_api_mutex);
 }
-
-

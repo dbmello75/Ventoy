@@ -11,7 +11,7 @@ civetweb.o:
         -DUSE_STACK_SIZE=102400 -DNDEBUG -fPIC \
         ./Ventoy2Disk/Lib/libhttp/include/civetweb.c \
         -o ./civetweb.o
-    
+
 gtk3: civetweb.o
 	$(CC) $(CPPFLAGS) -O2 -Wall -Wno-unused-function -DSTATIC=static -DINIT= \
         -I./Ventoy2Disk \
@@ -47,4 +47,3 @@ gtk3: civetweb.o
 clean:
 	rm -f civetweb.o
 	rm -f Ventoy2Disk.gtk3
-

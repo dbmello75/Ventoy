@@ -29,7 +29,7 @@
 
 #ifndef USE_MUSL_C
 
-#ifndef USE_DIET_C 
+#ifndef USE_DIET_C
 #ifndef __mips__
 typedef unsigned long long uint64_t;
 #endif
@@ -132,4 +132,3 @@ int vtoy_find_disk_by_guid(ventoy_os_param *param, char *diskname);
 #endif
 
 #define _ULL unsigned long long
-

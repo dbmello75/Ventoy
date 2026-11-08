@@ -695,4 +695,3 @@ GRUB_MOD_FINI(ventoy)
 {
     ventoy_unregister_all_cmd();
 }
-

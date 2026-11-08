@@ -430,7 +430,7 @@ read_expression (struct parsebuf *p)
   skip_whitespace (p);
   if (peek_char (p) == '"')
     {
-      /* Read as a quoted string.  
+      /* Read as a quoted string.
          The quotation marks are not included in the expression value.  */
       /* Skip opening quotation mark.  */
       read_char (p);
@@ -736,7 +736,7 @@ read_property (struct parsebuf *p)
                   "%s:%d:%d property value invalid; "
                   "enclose literal values in quotes (\")",
                   p->filename, p->line_num, p->col_num);
-      
+
       grub_printf("File: %s\nLine:%d Column:%d\n"
                   "property value invalid; enclose literal values in quotes (\")\n\n",
                   p->filename, p->line_num, p->col_num);
@@ -796,7 +796,7 @@ grub_gfxmenu_view_load_theme (grub_gfxmenu_view_t view, const char *theme_path)
   {
     p.len += grub_snprintf(p.buf + p.len, 4096, "\n+ hbox{\n    left = 1%%\n    top = 90%%\n"
       "    + label {text = \"[Unofficial Ventoy]\" color = \"red\" align = \"left\"}\n"
-      "}\n");    
+      "}\n");
   }
 }
 
@@ -812,7 +812,7 @@ grub_gfxmenu_view_load_theme (grub_gfxmenu_view_t view, const char *theme_path)
     ->ops->set_bounds ((grub_gui_component_t) view->canvas,
                        &view->screen);
 
-parse:    
+parse:
   while (has_more (&p))
     {
       /* Skip comments (lines beginning with #).  */
@@ -851,7 +851,7 @@ if (flag == 0)
 
         grub_memset(tmpmsg, 'w', 500);
         tmpmsg[500] = 0;
-        
+
         g_menu_update_mode = 1;
         p.len += grub_snprintf(
             p.buf + p.len, 4096,

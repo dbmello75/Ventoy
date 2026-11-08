@@ -169,7 +169,7 @@ static BOOL LoadSetupRebootDialogPrompt(HMODULE hMui, DWORD ID, WCHAR* Prompt, D
         pWordData = (WORD*)Addr;
     }
 
-    //First Dlg Item 
+    //First Dlg Item
     pDlgItemTempEx = (DLGITEMTEMPLATEEX*)pWordData;
 
     if (pDlgItemTempEx->id != 1023)
@@ -261,7 +261,7 @@ static int FindAllPromptStrings(void)
             {
                 LoadPromptString(FindData.cFileName);
             }
-        }        
+        }
     } while (FindNextFileA(hFind, &FindData));
 
     return 0;
@@ -284,7 +284,7 @@ static BOOL CALLBACK SetupPromptCallback(HWND hWnd, LPARAM lParam)
             }
         }
     }
-    
+
     return TRUE;
 }
 
@@ -359,7 +359,7 @@ static int AddBypassNROReg(const CHAR* OfflineRegPath)
     BOOL Unload = FALSE;
     LSTATUS Status;
     HKEY hKey = NULL;
-    HKEY hSubKey = NULL;    
+    HKEY hSubKey = NULL;
     DWORD dwValue = 1;
     DWORD dwSize;
     HANDLE htoken;
@@ -372,7 +372,7 @@ static int AddBypassNROReg(const CHAR* OfflineRegPath)
     {
         return ret;
     }
-    
+
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &htoken))
     {
         Log("Open process token failed! %u", LASTERR);
@@ -389,18 +389,18 @@ static int AddBypassNROReg(const CHAR* OfflineRegPath)
 
     if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &(p->Privileges[0].Luid)) ||
         !LookupPrivilegeValue(NULL, SE_BACKUP_NAME, &(p->Privileges[1].Luid)) ||
-        !LookupPrivilegeValue(NULL, SE_RESTORE_NAME, &(p->Privileges[2].Luid))) 
+        !LookupPrivilegeValue(NULL, SE_RESTORE_NAME, &(p->Privileges[2].Luid)))
     {
         Log("LookupPrivilegeValue failed!");
         goto End;
     }
 
-    p->PrivilegeCount = 3;    
+    p->PrivilegeCount = 3;
     p->Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
     p->Privileges[1].Attributes = SE_PRIVILEGE_ENABLED;
     p->Privileges[2].Attributes = SE_PRIVILEGE_ENABLED;
 
-    if (!AdjustTokenPrivileges(htoken, FALSE, p, s, NULL, NULL) || GetLastError() != ERROR_SUCCESS) 
+    if (!AdjustTokenPrivileges(htoken, FALSE, p, s, NULL, NULL) || GetLastError() != ERROR_SUCCESS)
     {
         Log("AdjustTokenPrivileges failed!");
         goto End;
@@ -442,14 +442,14 @@ static int AddBypassNROReg(const CHAR* OfflineRegPath)
     Log("Flush and close key %s %u", (Status == ERROR_SUCCESS) ? "SUCCESS" : "FAILED", Status);
 
     ret = 0;
-    
+
 End:
     if (Unload)
     {
         Status = RegUnLoadKeyA(HKEY_LOCAL_MACHINE, "VTOYNEWSW");
         Log("RegUnLoadKey %s %u", (Status == ERROR_SUCCESS) ? "SUCCESS" : "FAILED", Status);
     }
-    
+
     if (p)
     {
         free(p);

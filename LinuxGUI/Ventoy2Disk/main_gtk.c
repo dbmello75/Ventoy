@@ -52,9 +52,9 @@ int early_msgbox(GtkMessageType type, GtkButtonsType buttons, const char *str)
 {
     int ret;
     GtkWidget *pMsgBox = NULL;
-    
+
     pMsgBox= gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, type, buttons, str);
-    
+
     ret = gtk_dialog_run(GTK_DIALOG(pMsgBox));
     gtk_widget_destroy(pMsgBox);
 
@@ -91,9 +91,9 @@ static int adjust_cur_dir(char *argv0)
         {
             *pos = 0;
         }
-        
+
         ret = chdir(argv0);
-        
+
         *end = c;
         if (pos)
         {
@@ -115,17 +115,17 @@ int main(int argc, char *argv[])
     struct stat logstat;
 
     gtk_init(&argc, &argv);
-    
+
     if (geteuid() != 0)
     {
-        early_msgbox(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, 
+        early_msgbox(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
                      "Ventoy2Disk permission denied!\r\nPlease run with root privileges.");
         return EACCES;
     }
 
     if (access("./boot/boot.img", F_OK) == -1)
     {
-        adjust_cur_dir(argv[0]);        
+        adjust_cur_dir(argv[0]);
     }
 
     if (access("./boot/boot.img", F_OK) == -1)
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    
+
     snprintf(g_log_file, sizeof(g_log_file), "log.txt");
     snprintf(g_ini_file, sizeof(g_ini_file), "./Ventoy2Disk.ini");
     for (i = 1; i < (argc - 1) ; i++)
@@ -194,14 +194,14 @@ int main(int argc, char *argv[])
 
     if (g_kiosk_mode)
     {
-        gtk_image_set_from_file((GtkImage *)gtk_builder_get_object(pBuilder, "image_refresh"), "/ventoy/refresh.png");        
-        gtk_image_set_from_file((GtkImage *)gtk_builder_get_object(pBuilder, "image_secure_local"), "/ventoy/secure.png");        
-        gtk_image_set_from_file((GtkImage *)gtk_builder_get_object(pBuilder, "image_secure_dev"), "/ventoy/secure.png");        
+        gtk_image_set_from_file((GtkImage *)gtk_builder_get_object(pBuilder, "image_refresh"), "/ventoy/refresh.png");
+        gtk_image_set_from_file((GtkImage *)gtk_builder_get_object(pBuilder, "image_secure_local"), "/ventoy/secure.png");
+        gtk_image_set_from_file((GtkImage *)gtk_builder_get_object(pBuilder, "image_secure_dev"), "/ventoy/secure.png");
     }
     else
     {
         pData = get_refresh_icon_raw_data(&len);
-        set_image_from_pixbuf(pBuilder, "image_refresh", pData, len);        
+        set_image_from_pixbuf(pBuilder, "image_refresh", pData, len);
         pData = get_secure_icon_raw_data(&len);
         set_image_from_pixbuf(pBuilder, "image_secure_local", pData, len);
         set_image_from_pixbuf(pBuilder, "image_secure_dev", pData, len);
@@ -221,9 +221,9 @@ int main(int argc, char *argv[])
 
     ventoy_disk_exit();
     ventoy_http_exit();
-    
+
     g_object_unref (G_OBJECT(pBuilder));
-    
+
     vlog("######## Ventoy2Disk GTK %s exit ########\n", ventoy_get_local_version());
 
     /* log exit must at the end */

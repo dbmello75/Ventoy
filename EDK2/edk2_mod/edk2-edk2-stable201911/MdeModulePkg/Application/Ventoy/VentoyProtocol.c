@@ -1160,12 +1160,12 @@ EFI_STATUS EFIAPI ventoy_install_blockio(IN EFI_HANDLE ImageHandle, IN UINT64 Im
         g_sector_2048_read = gMemdiskMode ? ventoy_block_io_ramdisk_read : ventoy_block_io_read;
         g_sector_2048_write = gMemdiskMode ? ventoy_block_io_ramdisk_write : ventoy_block_io_write;
         pBlockIo->ReadBlocks = ventoy_block_io_read_512;
-    	pBlockIo->WriteBlocks = ventoy_block_io_write_512;
+        pBlockIo->WriteBlocks = ventoy_block_io_write_512;
     }
     else
     {
         pBlockIo->ReadBlocks = gMemdiskMode ? ventoy_block_io_ramdisk_read : ventoy_block_io_read;
-    	pBlockIo->WriteBlocks = ventoy_block_io_write;
+        pBlockIo->WriteBlocks = ventoy_block_io_write;
     }
 
 	pBlockIo->FlushBlocks = ventoy_block_io_flush;
@@ -1968,5 +1968,3 @@ EFI_STATUS ventoy_unlock_res(VOID)
     g_org_set_mode = NULL;
     return EFI_SUCCESS;
 }
-
-

@@ -285,4 +285,3 @@ typedef INT32   INTN;
 #define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(UINTN)(FunctionPointer)
 
 #endif
-

@@ -2615,4 +2615,3 @@ typedef Elf64_Xword Elf_Xword;
 #endif
 
 #endif /* ! GRUB_ELF_H */
-

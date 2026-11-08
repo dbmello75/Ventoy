@@ -284,12 +284,12 @@ int exfat_close(struct exfat_dev* dev)
     if (dev->fd != g_vtoy_exfat_disk_fd)
     {
         if (close(dev->fd) != 0)
-    	{
-    		exfat_error("failed to close device: %s", strerror(errno));
-    		rc = -EIO;
-    	}
+        {
+                exfat_error("failed to close device: %s", strerror(errno));
+                rc = -EIO;
+        }
     }
-	
+
 	free(dev);
 	return rc;
 }
@@ -337,7 +337,7 @@ off_t exfat_seek(struct exfat_dev* dev, off_t offset, int whence)
         {
             return -1;
         }
-        
+
         lseek(dev->fd, 512 * 2048 + offset, SEEK_SET);
         return offset;
     }
@@ -358,7 +358,7 @@ off_t exfat_seek(struct exfat_dev* dev, off_t offset, int whence)
     else
     {
         exfat_error("Invalid seek whence %d", whence);
-    	return lseek(dev->fd, offset, whence);        
+        return lseek(dev->fd, offset, whence);
     }
 #endif
 }
@@ -460,13 +460,13 @@ ssize_t exfat_generic_pwrite(struct exfat* ef, struct exfat_node* node,
 	const char* bufp = buffer;
 	off_t lsize, loffset, remainder;
 
- 	if (offset > node->size)
+        if (offset > node->size)
 	{
 		rc = exfat_truncate(ef, node, offset, true);
 		if (rc != 0)
 			return rc;
 	}
-  	if (offset + size > node->size)
+        if (offset + size > node->size)
 	{
 		rc = exfat_truncate(ef, node, offset + size, false);
 		if (rc != 0)

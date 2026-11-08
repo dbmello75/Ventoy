@@ -291,4 +291,3 @@ typedef INT64   INTN;
 #define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(UINTN)(FunctionPointer)
 
 #endif
-

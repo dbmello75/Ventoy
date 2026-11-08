@@ -1354,4 +1354,3 @@ void ventoy_prompt_end(void);
 int ventoy_set_sb_policy(void);
 
 #endif /* __VENTOY_DEF_H__ */
-

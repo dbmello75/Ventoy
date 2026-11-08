@@ -66,7 +66,7 @@ iterate_device (const char *name, void *data)
   int found = 0;
 
   /* Skip floppy drives when requested.  */
-  if (ctx->no_floppy && strlen(name) > 2 && 
+  if (ctx->no_floppy && strlen(name) > 2 &&
       name[0] == 'f' && name[1] == 'd' && name[2] >= '0' && name[2] <= '9')
     return 0;
 
@@ -189,14 +189,14 @@ part_hook (grub_disk_t disk, const grub_partition_t partition, void *data)
   if (!devname)
     return 1;
   ret = iterate_device (devname, ctx);
-  grub_free (devname);    
+  grub_free (devname);
 
   return ret;
 }
 
 /* Helper for FUNC_NAME.  */
 static void
-try (struct search_ctx *ctx)    
+try (struct search_ctx *ctx)
 {
   unsigned i;
   struct cache_entry **prev;

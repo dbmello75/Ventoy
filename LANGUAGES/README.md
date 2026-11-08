@@ -30,3 +30,5 @@ All languages must be sorted **lexicographically by name**
 >  [`LANGUAGES/languages_list.md`](languages_list.md)
 >
 > This helps keep the language support documentation complete and up to date.
+
+Validate GUI locale ordering with `bash languages_check_order.sh --check-utf8 languages.json`. Sort with `bash languages_sort_by_names.sh languages.json` (requires jq).

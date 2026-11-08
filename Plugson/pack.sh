@@ -34,11 +34,11 @@ fi
 
 [ -f ./www/helplist ] && rm -f ./www/helplist
 ls -1 ../INSTALL/grub/help/ | while read line; do
-    echo -n ${line:0:5} >> ./www/helplist
+    printf '%s\n' "${line%.txt}" >> ./www/helplist
 done
 [ -f ./www/menulist ] && rm -f ./www/menulist
 ls -1 ../INSTALL/grub/menu/ | while read line; do
-    echo -n ${line:0:5} >> ./www/menulist
+    printf '%s\n' "${line%.json}" >> ./www/menulist
 done
 echo -n "$plugson_verion" > ./www/buildtime
 
@@ -58,5 +58,3 @@ mv ./www.tar.xz ../INSTALL/tool/plugson.tar.xz
 echo ""
 echo "========= SUCCESS ==========="
 echo ""
-
-

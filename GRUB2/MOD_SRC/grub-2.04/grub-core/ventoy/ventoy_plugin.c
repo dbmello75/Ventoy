@@ -3654,5 +3654,3 @@ grub_err_t ventoy_cmd_pop_menulang(grub_extcmd_context_t ctxt, int argc, char **
 
     VENTOY_CMD_RETURN(0);
 }
-
-

@@ -1,6 +1,6 @@
 #!/bin/bash
-# 
-# For 32bit, for example CentOS 6.10 i386 
+#
+# For 32bit, for example CentOS 6.10 i386
 # automake 1.11.1 must update to automake 1.11.2
 # pkg-config must be installed
 #
@@ -58,7 +58,3 @@ cp mkfs/mkexfatfs ../EXFAT/shared/mkexfatfs
 
 cd ..
 rm -rf exfat-1.3.0
-
-
-
-

@@ -24,7 +24,7 @@ FILE=""
 while (( $# )); do
   case "$1" in
     --case-sensitive) CASE_INSENSITIVE=0; shift ;;
-    --check-utf8)     CHECK_UTF-8=1; shift ;;
+    --check-utf8)     CHECK_UTF8=1; shift ;;
     -h|--help)        usage; exit 0 ;;
     *)                FILE="${1}"; shift ;;
   esac
@@ -80,13 +80,13 @@ if [[ "$IS_SORTED" != "true" ]]; then
     ( map(.name) ) as \$n
     | ( map(sk) )  as \$k
     | (\$k|sort)   as \$s
-    | ( [range(0; (\$k|length))] 
-        | map(select(\$k[.] != \$s[.])) 
+    | ( [range(0; (\$k|length))]
+        | map(select(\$k[.] != \$s[.]))
         | .[0] ) as \$i
     | if \$i == null then
         \"(Could not compute mismatch index)\"
       else
-        \"First mismatch at index \(\$i): actual=\\\"\(\$n[\$i])\\\" vs expected(order key)=\\\"\(\$s[\$i])\\\"\" 
+        \"First mismatch at index \(\$i): actual=\\\"\(\$n[\$i])\\\" vs expected(order key)=\\\"\(\$s[\$i])\\\"\"
       end
   " "$FILE"
   exit 1

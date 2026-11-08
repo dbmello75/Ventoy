@@ -55,7 +55,7 @@ static int lzma_uncompress(void *dest, void *src, int size, int outsize,
 
 	res = LzmaUncompress(dest, &outlen, src + LZMA_HEADER_SIZE, &inlen, src,
 		LZMA_PROPS_SIZE);
-	
+
 	if(res == SZ_OK)
 		return outlen;
 	else {
@@ -75,4 +75,3 @@ struct compressor lzma_comp_ops = {
 	.name = "lzma",
 	.supported = 1
 };
-

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import sys
 import time
 import subprocess
@@ -75,6 +76,7 @@ def run_boot_test(mode="uefi", wait_sec=8):
 
     ppm_out = os.path.join(OUTPUT_DIR, f"boot_{mode}.ppm")
     png_out = os.path.join(OUTPUT_DIR, f"boot_{mode}.png")
+    serial_out = os.path.join(OUTPUT_DIR, f"boot_{mode}.serial.log")
 
     has_kvm = os.path.exists("/dev/kvm") and os.access("/dev/kvm", os.R_OK | os.W_OK)
 
@@ -87,6 +89,8 @@ def run_boot_test(mode="uefi", wait_sec=8):
         "-display", "none",
         "-vga", "std",
         "-no-reboot",
+        "-snapshot",
+        "-serial", f"file:{serial_out}",
     ]
 
     if has_kvm:
@@ -165,8 +169,13 @@ def run_boot_test(mode="uefi", wait_sec=8):
 
     if os.path.exists(ppm_out) and os.path.getsize(ppm_out) > 0:
         if ppm_to_png(ppm_out, png_out):
-            print(f"[SUCCESS] {mode.upper()} Boot Test Passed: {png_out}")
-            return True, png_out
+            pattern = os.environ.get("VTOY_BOOT_SUCCESS_REGEX")
+            serial = open(serial_out, errors="replace").read() if os.path.exists(serial_out) else ""
+            if pattern and re.search(pattern, serial):
+                print(f"[SUCCESS] {mode.upper()} guest serial evidence matched: {png_out}")
+                return True, png_out
+            print(f"[UNVERIFIED] Captured {png_out}; no guest boot success evidence. Set VTOY_BOOT_SUCCESS_REGEX for the test guest.")
+            return False, png_out
 
     print(f"[WARNING] No screendump output produced for {mode.upper()} mode.")
     return False, None

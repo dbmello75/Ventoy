@@ -484,4 +484,3 @@ int main(int argc, char **argv)
     free(g_disk_entry_list);
     return rc;
 }
-

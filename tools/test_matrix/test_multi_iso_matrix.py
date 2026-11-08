@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import sys
 import time
 import subprocess
@@ -116,7 +117,9 @@ def run_os_test(test: BootTestCase, nav_down_count: int):
         "-monitor", f"unix:{sock_path},server,nowait",
         "-display", "none",
         "-vga", "virtio",
-        "-no-reboot"
+        "-no-reboot",
+        "-snapshot",
+        "-serial", f"file:{os.path.join(OUTPUT_BASE, test.test_id + '.serial.log')}"
     ]
 
     if has_kvm:
@@ -224,8 +227,11 @@ def run_os_test(test: BootTestCase, nav_down_count: int):
 
         s.sendall(b"quit\n")
         s.close()
-        passed = True
-        print(f"  [SUCCESS] {test.name} ({mode_str}) test completed successfully!")
+        pattern = os.environ.get("VTOY_BOOT_SUCCESS_REGEX")
+        serial_path = os.path.join(OUTPUT_BASE, test.test_id + '.serial.log')
+        serial = open(serial_path, errors="replace").read() if os.path.exists(serial_path) else ""
+        passed = bool(pattern and re.search(pattern, serial))
+        print(f"  [{'PASSED' if passed else 'UNVERIFIED'}] {test.name} ({mode_str}); screenshots alone do not verify boot.")
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -247,7 +253,7 @@ def run_os_test(test: BootTestCase, nav_down_count: int):
         "id": test.test_id,
         "name": test.name,
         "mode": mode_str,
-        "status": "PASSED" if passed else "FAILED",
+        "status": "PASSED" if passed else "UNVERIFIED" if booted_img_path and os.path.exists(booted_img_path) else "FAILED",
         "screenshot": f"{test.test_id}_booted.png" if booted_img_path and os.path.exists(booted_img_path) else "N/A"
     }
 
@@ -349,6 +355,8 @@ def main():
             status_badge = "**PASSED**"
         elif r["status"] == "SKIPPED":
             status_badge = "_SKIPPED_"
+        elif r["status"] == "UNVERIFIED":
+            status_badge = "**UNVERIFIED**"
         else:
             status_badge = "**FAILED**"
         summary_lines.append(f"| `{r['id']}` | {r['name']} | {r['mode']} | {status_badge} | `{r['screenshot']}` |")
@@ -364,11 +372,14 @@ def main():
         with open(github_summary, "a") as gsf:
             gsf.write(summary_text)
 
-    failed_count = sum(1 for r in results if r["status"] == "FAILED")
+    failed_count = sum(1 for r in results if r["status"] in ("FAILED", "UNVERIFIED"))
     if failed_count > 0:
         print(f"\n[FAIL] {failed_count} test matrix case(s) failed.")
         sys.exit(1)
     else:
+        if not any(r["status"] == "PASSED" for r in results):
+            print("No boot case was verified.")
+            sys.exit(2)
         print(f"\n[SUCCESS] Completed {len(results)} test case(s) without failures.")
 
 if __name__ == "__main__":
