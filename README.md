@@ -91,6 +91,8 @@ See all supported languages here: [languages_list.md](LANGUAGES/languages_list.m
 See [https://www.ventoy.net/en/doc_start.html](https://www.ventoy.net/en/doc_start.html) for detailed instructions. 
 
 # Compile Instructions
+With Docker and Docker Compose installed, run `docker compose up` from the repository root. The packages are written to `INSTALL/`. GitHub Actions also publishes CI build artifacts.
+
 Please refer to [BuildVentoyFromSource.txt](DOC/BuildVentoyFromSource.txt)
 
 # Document
