@@ -946,7 +946,7 @@ static void * ventoy_install_thread(void *data)
     
     /* reopen for write part table */
     g_current_progress = PT_WRITE_PART_TABLE;
-    vlog("Writting Partition Table style:%d...\n", thread->partstyle);
+    vlog("Writing Partition Table style:%d...\n", thread->partstyle);
 
     fd = ventoy_disk_open(disk, "rw", O_BINARY);
 
@@ -960,7 +960,7 @@ static void * ventoy_install_thread(void *data)
     {
         offset = lseek(fd, 0, SEEK_SET);
         len = write(fd, &MBR, 512);
-        vlog("Writting MBR Partition Table %llu %llu\n", (_ull)offset, (_ull)len);
+        vlog("Writing MBR Partition Table %llu %llu\n", (_ull)offset, (_ull)len);
         if (offset != 0 || len != 512)
         {
             goto err;
