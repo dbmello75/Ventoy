@@ -989,68 +989,54 @@ int vtoydm_main(int argc, char **argv)
 
     while ((ch = getopt(argc, argv, "s:l:o:d:f:v::i::p::r::c::h::e::E::C::w::")) != -1)
     {
-        if (ch == 'd')
+        switch (ch)
         {
+            case 'd':
             strncpy(diskname, optarg, sizeof(diskname) - 1);
-        }
-        else if (ch == 'f')
-        {
+                break;
+            case 'f':
             strncpy(filepath, optarg, sizeof(filepath) - 1);
-        }
-        else if (ch == 'p')
-        {
+                break;
+            case 'p':
             cmd = CMD_PRINT_TABLE;
-        }
-        else if (ch == 'r')
-        {
+                break;
+            case 'r':
             cmd = CMD_PRINT_RAW_TABLE;
-        }
-        else if (ch == 'w')
-        {
+                break;
+            case 'w':
             cmd = CMD_PRINT_WRAP_TABLE;
-        }
-        else if (ch == 'c')
-        {
+                break;
+            case 'c':
             cmd = CMD_CREATE_DM;
-        }
-        else if (ch == 'C')
-        {
+                break;
+            case 'C':
             cmd = CMD_COPY_ISO;
-        }
-        else if (ch == 'i')
-        {
+                break;
+            case 'i':
             cmd = CMD_DUMP_ISO_INFO;
-        }
-        else if (ch == 'e')
-        {
+                break;
+            case 'e':
             cmd = CMD_EXTRACT_ISO_FILE;
-        }
-        else if (ch == 'E')
-        {
+                break;
+            case 'E':
             cmd = CMD_PRINT_EXTRACT_ISO_FILE;
-        }
-        else if (ch == 's')
-        {
+                break;
+            case 's':
             first_sector = strtoul(optarg, NULL, 10);
-        }
-        else if (ch == 'l')
-        {
+                break;
+            case 'l':
             file_size = strtoull(optarg, NULL, 10);
-        }
-        else if (ch == 'o')
-        {
+                break;
+            case 'o':
             strncpy(outfile, optarg, sizeof(outfile) - 1);
-        }
-        else if (ch == 'v')
-        {
+                break;
+            case 'v':
             verbose = 1;
-        }
-        else if (ch == 'h')
-        {
+                break;
+            case 'h':
             return vtoydm_print_help(stdout);
-        }
-        else
-        {
+                break;
+            default:
             vtoydm_print_help(stderr);
             return 1;
         }
