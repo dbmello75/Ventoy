@@ -7,7 +7,7 @@ rm -rf $VT_DIR/GRUB2/PXE
 mkdir -p $VT_DIR/GRUB2/INSTALL
 mkdir -p $VT_DIR/GRUB2/PXE
 
-make install
+make install || exit 1
 
 PATH=$VT_DIR/GRUB2/INSTALL/bin/:$VT_DIR/GRUB2/INSTALL/sbin/:$PATH
 
