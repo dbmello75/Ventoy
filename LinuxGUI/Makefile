@@ -1,9 +1,10 @@
 CC = gcc
+CPPFLAGS += -DVTOY_USE_UDISKS
 UDISKS2 := $(shell pkg-config --libs -cflags udisks2)
 GTK3 := $(shell pkg-config --libs -cflags gtk+-3.0)
 
 civetweb.o:
-	$(CC) -std=gnu99 -D_FILE_OFFSET_BITS=64 -c -Wall -Wextra -Wshadow -Wformat-security -Winit-self \
+	$(CC) $(CPPFLAGS) -std=gnu99 -D_FILE_OFFSET_BITS=64 -c -Wall -Wextra -Wshadow -Wformat-security -Winit-self \
         -Wmissing-prototypes -O2 -DLINUX \
         -I./Ventoy2Disk/Lib/libhttp/include \
         -DNDEBUG -DNO_CGI -DNO_CACHING -DNO_SSL -DSQLITE_DISABLE_LFS -DSSL_ALREADY_INITIALIZED \
@@ -12,7 +13,7 @@ civetweb.o:
         -o ./civetweb.o
     
 gtk3: civetweb.o
-	$(CC) -O2 -Wall -Wno-unused-function -DSTATIC=static -DINIT= \
+	$(CC) $(CPPFLAGS) -O2 -Wall -Wno-unused-function -DSTATIC=static -DINIT= \
         -I./Ventoy2Disk \
         -I./Ventoy2Disk/Core \
         -I./Ventoy2Disk/Web \

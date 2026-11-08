@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 if [ ! -f "edk2-edk2-stable201911.zip" ] || ! echo "c6f691aa91afbaab811a369fe729f61d8e5b58bb5ad79a45446c9ee849c1a60b  edk2-edk2-stable201911.zip" | sha256sum -c - >/dev/null 2>&1; then
     echo "Downloading edk2-edk2-stable201911.zip..."
@@ -18,7 +19,7 @@ if [ -f "edk2-edk2-stable201911.zip" ]; then
     sed -i "s/\.tostring()/\.tobytes()/g" BaseTools/Source/Python/GenPatchPcdTable/GenPatchPcdTable.py 2>/dev/null || true
     find BaseTools/Source/Python -name "*.py" -exec sed -i "s/\.tostring()/\.tobytes()/g" {} + 2>/dev/null || true
     find BaseTools/Source/C -type f \( -name "Makefile*" -o -name "*.makefile" \) -exec sed -i 's/-Werror//g' {} + 2>/dev/null || true
-    BUILD_CFLAGS="-Wno-error" make -j 4 -C BaseTools/ || true
+    BUILD_CFLAGS="-Wno-error" make -j 4 -C BaseTools/
     cd ..
 
     echo '======== build EDK2 for i386-efi ==============='
@@ -33,10 +34,11 @@ if [ -f "edk2-edk2-stable201911.zip" ]; then
     echo '======== build EDK2 for x86_64-efi shim ==============='
     bash ./build_shim.sh
 else
-    echo "Warning: edk2-edk2-stable201911.zip not available, using pre-staged EFI binaries."
+    echo "EDK2 source archive is unavailable." >&2
+    exit 1
 fi
 
 
 if [ "${VTOY_BUILD_LOONGARCH:-0}" = "1" ]; then
-    sh ./buildloongarch64.sh || exit 1
+    bash ./buildloongarch64.sh || exit 1
 fi

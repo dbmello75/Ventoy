@@ -32,7 +32,7 @@ log "Step 1/7: Building VtoyTool Linux Userspace Binaries..."
 if [ -d "${VTOY_ROOT}/VtoyTool" ]; then
     cd "${VTOY_ROOT}/VtoyTool"
     if [ -f "build.sh" ]; then
-        bash build.sh || log "VtoyTool build finished with status $?"
+        bash build.sh
     fi
     cd "${VTOY_ROOT}"
 fi
@@ -47,7 +47,7 @@ if [ -d "${VTOY_ROOT}/vtoyjump/vtoyjump" ]; then
             -Wl,--subsystem,console -Wl,--nxcompat -Wl,--dynamicbase -Wl,--image-base,0x140000000 -Wl,--build-id=none \
             vtoyjump.c setupmon.c fat_io_lib/fat_access.c fat_io_lib/fat_cache.c fat_io_lib/fat_filelib.c fat_io_lib/fat_misc.c fat_io_lib/fat_string.c fat_io_lib/fat_table.c fat_io_lib/fat_write.c \
             xz-embedded-20130513/linux/lib/decompress_unxz.c \
-            -o "${VTOY_ROOT}/INSTALL/ventoy/vtoyjump64.exe" -lvirtdisk -lversion -luser32 -ladvapi32 -lkernel32 -lgdi32 -lole32 || true
+            -o "${VTOY_ROOT}/INSTALL/ventoy/vtoyjump64.exe" -lvirtdisk -lversion -luser32 -ladvapi32 -lkernel32 -lgdi32 -lole32
     fi
     if command -v i686-w64-mingw32-gcc >/dev/null 2>&1; then
         i686-w64-mingw32-gcc -O2 -s -DSTATIC=static -DINIT= -DVTOY_BIT=32 -DFATFS_INC_FORMAT_SUPPORT=0 -DWIN32 -DNDEBUG -DXZ_PREBOOT \
@@ -55,7 +55,7 @@ if [ -d "${VTOY_ROOT}/vtoyjump/vtoyjump" ]; then
             -Wl,--subsystem,console -Wl,--nxcompat -Wl,--dynamicbase -Wl,--build-id=none \
             vtoyjump.c setupmon.c fat_io_lib/fat_access.c fat_io_lib/fat_cache.c fat_io_lib/fat_filelib.c fat_io_lib/fat_misc.c fat_io_lib/fat_string.c fat_io_lib/fat_table.c fat_io_lib/fat_write.c \
             xz-embedded-20130513/linux/lib/decompress_unxz.c \
-            -o "${VTOY_ROOT}/INSTALL/ventoy/vtoyjump32.exe" -lvirtdisk -lversion -luser32 -ladvapi32 -lkernel32 -lgdi32 -lole32 || true
+            -o "${VTOY_ROOT}/INSTALL/ventoy/vtoyjump32.exe" -lvirtdisk -lversion -luser32 -ladvapi32 -lkernel32 -lgdi32 -lole32
     fi
     cd "${VTOY_ROOT}"
 fi
@@ -73,7 +73,7 @@ log "Step 4/7: Building GRUB2 Custom Bootloader Core..."
 if [ -d "${VTOY_ROOT}/GRUB2" ]; then
     cd "${VTOY_ROOT}/GRUB2"
     if [ -f "buildgrub.sh" ]; then
-        bash buildgrub.sh || log "GRUB2 build finished with status $?"
+        bash buildgrub.sh
     fi
     cd "${VTOY_ROOT}"
 fi
@@ -83,7 +83,7 @@ for tool_dir in vtoycli FUSEISO SQUASHFS LZIP ZSTD VBLADE Vlnk LinuxGUI; do
     if [ -d "${VTOY_ROOT}/${tool_dir}" ]; then
         cd "${VTOY_ROOT}/${tool_dir}"
         if [ -f "build.sh" ]; then
-            bash build.sh || log "${tool_dir} build finished with status $?"
+            bash build.sh
         fi
         cd "${VTOY_ROOT}"
     fi
@@ -92,21 +92,21 @@ done
 log "Step 6/7: Deterministically Packing CPIO and Image Archives..."
 if [ -d "${VTOY_ROOT}/IMG" ]; then
     cd "${VTOY_ROOT}/IMG"
-    bash mkcpio.sh || log "mkcpio finished with status $?"
-    bash mkloopex.sh || log "mkloopex finished with status $?"
+    bash mkcpio.sh
+    bash mkloopex.sh
     cd "${VTOY_ROOT}"
 fi
 
 if [ -d "${VTOY_ROOT}/Unix" ]; then
     cd "${VTOY_ROOT}/Unix"
-    bash pack_unix.sh || log "pack_unix finished with status $?"
+    bash pack_unix.sh
     cd "${VTOY_ROOT}"
 fi
 
 log "Step 7/7: Executing Deterministic Release Assembly & Hash Patching..."
 if [ -d "${VTOY_ROOT}/INSTALL" ]; then
     cd "${VTOY_ROOT}/INSTALL"
-    bash ventoy_pack.sh "$@" || log "ventoy_pack finished with status $?"
+    bash ventoy_pack.sh "$@"
     cd "${VTOY_ROOT}"
 fi
 

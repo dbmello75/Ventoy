@@ -1,3 +1,6 @@
+#ifdef VTOY_USE_UDISKS
+#include "ventoy_util.h.udisks.inc"
+#else
 /******************************************************************************
  * ventoy_util.h
  *
@@ -40,7 +43,7 @@ int ventoy_get_sys_file_line(char *buffer, int buflen, const char *fmt, ...);
 uint64_t ventoy_get_human_readable_gb(uint64_t SizeBytes);
 void ventoy_md5(const void *data, uint32_t len, uint8_t *md5);
 int ventoy_is_disk_mounted(const char *devpath);
-int ventoy_try_umount_disk(const ventoy_disk *disk);
+int ventoy_try_umount_disk(const char *devpath);
 int unxz(unsigned char *in, int in_size,
 	 int (*fill)(void *dest, unsigned int size),
 	 int (*flush)(void *src, unsigned int size),
@@ -55,3 +58,5 @@ int ventoy_fill_mbr_4k(uint64_t size, uint64_t reserve, int align4k, MBR_HEAD *p
 
 #endif /* __VENTOY_UTIL_H__ */
 
+
+#endif /* VTOY_USE_UDISKS */

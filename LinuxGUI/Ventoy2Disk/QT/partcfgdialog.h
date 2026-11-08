@@ -1,3 +1,6 @@
+#ifdef VTOY_USE_UDISKS
+#include "partcfgdialog.h.udisks.inc"
+#else
 #ifndef PARTCFGDIALOG_H
 #define PARTCFGDIALOG_H
 
@@ -28,7 +31,7 @@ public:
     explicit PartCfgDialog(QWidget *parent = nullptr);
     ~PartCfgDialog();
 
-private Q_SLOTS:
+private slots:
     void on_pushButtonOK_clicked();
 
     void on_pushButtonCancel_clicked();
@@ -42,3 +45,5 @@ private:
 #define _LANG_STR(id) obj.value(id).toString()
 
 #endif // PARTCFGDIALOG_H
+
+#endif /* VTOY_USE_UDISKS */

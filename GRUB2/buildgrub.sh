@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 VT_GRUB_DIR=$PWD
 

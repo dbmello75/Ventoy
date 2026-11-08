@@ -1,3 +1,6 @@
+#ifdef VTOY_USE_UDISKS
+#include "ventoy2diskwindow.h.udisks.inc"
+#else
 #ifndef VENTOY2DISKWINDOW_H
 #define VENTOY2DISKWINDOW_H
 
@@ -41,8 +44,9 @@ public:
     explicit MyQThread(QObject *parent = nullptr);
 protected:
     void run();
-Q_SIGNALS:
+signals:
     void thread_event(int msg, int data);
+public slots:
 };
 
 
@@ -70,7 +74,7 @@ protected:
     void showEvent(QShowEvent *ev);
     void closeEvent(QCloseEvent *event);
 
-private Q_SLOTS:
+private slots:
 
     void thread_event(int msg, int data);
     void part_style_check_action(QAction *act);
@@ -102,3 +106,5 @@ private:
 #define VERSION_FMT "<html><head/><body><p><span style=\" font-size:20pt; font-weight:600; color:#ff0000;\">%s</span></p></body></html>"
 
 #endif // VENTOY2DISKWINDOW_H
+
+#endif /* VTOY_USE_UDISKS */

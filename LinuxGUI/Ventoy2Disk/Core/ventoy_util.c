@@ -1,3 +1,6 @@
+#ifdef VTOY_USE_UDISKS
+#include "ventoy_util.c.udisks.inc"
+#else
 /******************************************************************************
  * ventoy_util.c  ---- ventoy util
  * Copyright (c) 2021, longpanda <admin@ventoy.net>
@@ -35,7 +38,6 @@
 #include <time.h>
 #include <ventoy_define.h>
 #include <ventoy_util.h>
-#include "ventoy_disk.h"
 
 uint8_t g_mbr_template[512];
 
@@ -136,7 +138,6 @@ int ventoy_get_sys_file_line(char *buffer, int buflen, const char *fmt, ...)
     }
 }
 
-// We don't use this anymore, we just unmount
 int ventoy_is_disk_mounted(const char *devpath)
 {
     int len;
@@ -194,47 +195,51 @@ static int ventoy_mount_path_escape(char *src, char *dst, int len)
     return 0;
 }
 
-int ventoy_try_umount_disk(const ventoy_disk *disk)
+int ventoy_try_umount_disk(const char *devpath)
 {
-    // We can't get the filesystem through the partition table so we have to cycle all objects
-    GList *objects = g_dbus_object_manager_get_objects(udisks_client_get_object_manager(get_udisks_client()));
+    int rc;
+    int len;
+    char line[1024];
+    char mntpt[1024];
+    char *pos1 = NULL;
+    char *pos2 = NULL;
+    FILE *fp = NULL;
 
-    for (GList *el = objects; el != NULL; el = el->next)
+    fp = fopen("/proc/mounts", "r");
+    if (!fp)
     {
-        UDisksObject *obj = UDISKS_OBJECT(el->data);
-        UDisksFilesystem *fs = udisks_object_get_filesystem(obj);
-
-        if (fs == NULL) continue;
-
-        if (udisks_object_peek_partition_table(obj) != disk->table) continue;
-
-        GVariant *options;
-        {
-            GVariantBuilder builder;
-            g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
-            g_variant_builder_add(&builder, "{sv}");
-            options = g_variant_builder_end(&builder);
-        }
-
-        GError *error = NULL;
-        g_variant_ref_sink(options);
-        udisks_filesystem_call_unmount_sync(fs, options, NULL, &error);
-        g_variant_unref(options);
-
-        if (error != NULL)
-        {
-            vlog("failed to unmount %s: %s\n", udisks_block_get_device(disk->blockdev), error->message);
-            g_error_free(error);
-            g_list_free_full(objects, g_object_unref);
-            g_object_unref(fs);
-            return 1;
-        }
-
-        g_object_unref(fs);
+        return 0;
     }
 
-    g_list_free_full(objects, g_object_unref);
+    len = (int)strlen(devpath);
+    while (fgets(line, sizeof(line), fp))
+    {
+        if (strncmp(line, devpath, len) == 0)
+        {
+            pos1 = strchr(line, ' ');
+            if (pos1)
+            {
+                pos2 = strchr(pos1 + 1, ' ');
+                if (pos2)
+                {
+                    *pos2 = 0;
+                }
 
+                ventoy_mount_path_escape(pos1 + 1, mntpt, sizeof(mntpt));                
+                rc = umount(mntpt);
+                if (rc)
+                {
+                    vdebug("umount <%s> <%s> [ failed ] error:%d\n", devpath, mntpt, errno);                                        
+                }
+                else
+                {
+                    vdebug("umount <%s> <%s> [ success ]\n", devpath, mntpt);
+                }
+            }
+        }
+    }
+
+    fclose(fp);
     return 0;
 }
 
@@ -642,3 +647,5 @@ int ventoy_fill_mbr_4k(uint64_t size, uint64_t reserve, int align4k, MBR_HEAD *p
     return 0;
 }
 
+
+#endif /* VTOY_USE_UDISKS */

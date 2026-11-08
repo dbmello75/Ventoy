@@ -1,12 +1,14 @@
-# LinuxGUI UDisks2 + Flatpak
-This is a fork of Ventoy which uses UDisks2 as a backend for LinuxGUI, so it can run as a flatpak.
+# Linux GUI
 
-## Development
+The build scripts select the native GTK, Qt or WebUI backend.
 
-You can get started with
+## Optional UDisks2 / Flatpak backend
 
-```
-flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo --install output LinuxGUI/net.ventoy.VentoyGUI.yml
-```
+The native backend remains the default. The community UDisks2 port from upstream
+PR #3319 is available with `make -C LinuxGUI gtk3` and requires the `udisks2` and
+`gtk+-3.0` development packages plus pkg-config. It selects the alternative source
+files with `VTOY_USE_UDISKS`. The Flatpak manifest is experimental.
 
-(See https://docs.flatpak.org/en/latest/first-build.html)
+This backend has not been validated against physical disks in this integration.
+Test installation, update, unmounting and permissions with disposable virtual
+disks before using it with data.

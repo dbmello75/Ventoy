@@ -1,3 +1,6 @@
+#ifdef VTOY_USE_UDISKS
+#include "ventoy_gtk.c.udisks.inc"
+#else
 /******************************************************************************
  * ventoy_gtk.c
  *
@@ -231,13 +234,13 @@ void on_devlist_changed(GtkWidget *widget, gpointer data)
     gtk_label_set_text(g_label_dev_part_style, "");
 
     active = gtk_combo_box_get_active((GtkComboBox *)g_dev_combobox);
-    if (active < 0 || active >= get_disks_len())
+    if (active < 0 || active >= g_disk_num)
     {
         vlog("invalid active combox id %d\n", active);
         return;
     }
 
-    cur = &g_array_index(disks, ventoy_disk, active);
+    cur = g_disk_list + active;
     if (cur->vtoydata.ventoy_valid)
     {
         if (cur->vtoydata.secure_boot_flag)
@@ -308,12 +311,14 @@ static ventoy_disk *select_active_dev(const char *select, int *activeid)
     /* find the match one */
     if (select)
     {
-        for (i = 0; i < get_disks_len(); i++)
+        for (i = 0; i < g_disk_num; i++)
         {
-            cur = &g_array_index(disks, ventoy_disk, i);
-
-            if (!alldev && cur->hint_ignore) continue;
-                        
+            cur = g_disk_list + i;
+            if (alldev == 0 && cur->type != VTOY_DEVICE_USB)
+            {
+                continue;
+            }
+            
             if (strcmp(cur->disk_name, select) == 0)
             {
                 *activeid = i;
@@ -323,11 +328,13 @@ static ventoy_disk *select_active_dev(const char *select, int *activeid)
     }
 
     /* find the first one that installed with Ventoy */
-    for (i = 0; i < get_disks_len(); i++)
+    for (i = 0; i < g_disk_num; i++)
     {
-        cur = &g_array_index(disks, ventoy_disk, i);
-
-        if (!alldev && cur->hint_ignore) continue;
+        cur = g_disk_list + i;
+        if (alldev == 0 && cur->type != VTOY_DEVICE_USB)
+        {
+            continue;
+        }
         
         if (cur->vtoydata.ventoy_valid)
         {
@@ -337,30 +344,29 @@ static ventoy_disk *select_active_dev(const char *select, int *activeid)
     }
 
     /* find the first USB interface device */
-    for (i = 0; i < get_disks_len(); i++)
+    for (i = 0; i < g_disk_num; i++)
     {
-        cur = &g_array_index(disks, ventoy_disk, i);
-
-        if (!alldev && cur->hint_ignore) continue;
+        cur = g_disk_list + i;
+        if (alldev == 0 && cur->type != VTOY_DEVICE_USB)
+        {
+            continue;
+        }
         
-        UDisksDrive *drive = udisks_client_get_drive_for_block(get_udisks_client(), cur->blockdev);
-        char *bus = udisks_drive_get_connection_bus(drive);
-
-        if (strcmp(bus, "usb") == 0)
+        if (cur->type == VTOY_DEVICE_USB)
         {
             *activeid = i;
-            g_object_unref(drive);
             return cur;
         }
-        g_object_unref(drive);
     }
 
     /* use the first one */
-    for (i = 0; i < get_disks_len(); i++)
+    for (i = 0; i < g_disk_num; i++)
     {
-        cur = &g_array_index(disks, ventoy_disk, i);
-
-        if (!alldev && cur->hint_ignore) continue;
+        cur = g_disk_list + i;
+        if (alldev == 0 && cur->type != VTOY_DEVICE_USB)
+        {
+            continue;
+        }
         
         *activeid = i;
         return cur;
@@ -384,17 +390,20 @@ static void fill_dev_list(const char *select)
 
     alldev = ventoy_code_get_cur_show_all();
     
-    vlog("fill_dev_list total disk: %d showall:%d\n", get_disks_len(), alldev);
+    vlog("fill_dev_list total disk: %d showall:%d\n", g_disk_num, alldev);
 
     /* gtk_combo_box_text_remove_all */
     store = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(g_dev_combobox)));
     gtk_list_store_clear(store);
 
-    for (i = 0; i < get_disks_len(); i++)
+    for (i = 0; i < g_disk_num; i++)
     {
-        cur = &g_array_index(disks, ventoy_disk, i);
+        cur = g_disk_list + i;
 
-        if (!alldev && cur->hint_ignore) continue;
+        if (alldev == 0 && cur->type != VTOY_DEVICE_USB)
+        {
+            continue;
+        }
 
         g_snprintf(line, sizeof(line), "%s  [%s]  %s", cur->disk_name, cur->human_readable_size, cur->disk_model);
         gtk_combo_box_text_append_text(g_dev_combobox, line);
@@ -483,7 +492,7 @@ void on_clear_ventoy(GtkMenuItem *menuItem, gpointer data)
     }
 
     active = gtk_combo_box_get_active((GtkComboBox *)g_dev_combobox);
-    if (active < 0 || active >= get_disks_len())
+    if (active < 0 || active >= g_disk_num)
     {
         vlog("invalid active combox id %d\n", active);
         return;
@@ -505,7 +514,7 @@ void on_clear_ventoy(GtkMenuItem *menuItem, gpointer data)
     g_thread_run = TRUE;
 
 
-    cur = &g_array_index(disks, ventoy_disk, active);
+    cur = g_disk_list + active;
     g_snprintf(disk_name, sizeof(disk_name), "%s", cur->disk_name);
     g_snprintf(buf, sizeof(buf), "{\"method\":\"clean\",\"disk\":\"%s\"}", disk_name);
 
@@ -648,13 +657,13 @@ void on_button_install_clicked(GtkWidget *widget, gpointer data)
     }
 
     active = gtk_combo_box_get_active((GtkComboBox *)g_dev_combobox);
-    if (active < 0 || active >= get_disks_len())
+    if (active < 0 || active >= g_disk_num)
     {
         vlog("invalid active combox id %d\n", active);
         return;
     }
 
-    cur = &g_array_index(disks, ventoy_disk, active);
+    cur = g_disk_list + active;
 
     if (cur->is4kn)
     {
@@ -662,7 +671,7 @@ void on_button_install_clicked(GtkWidget *widget, gpointer data)
         return;
     }
 
-    if (ventoy_code_get_cur_part_style() == MBR_PART_STYLE && udisks_block_get_size(cur->blockdev) > 0x20000000000ULL)
+    if (ventoy_code_get_cur_part_style() == 0 && cur->size_in_byte > 2199023255552ULL)
     {
         msgbox(GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "STR_DISK_2TB_MBR_ERROR");
         return;
@@ -680,7 +689,7 @@ void on_button_install_clicked(GtkWidget *widget, gpointer data)
             space = space;
         }
 
-        size = udisks_block_get_size(cur->blockdev)/ SIZE_1MB;
+        size = cur->size_in_byte / SIZE_1MB;
         if (size <= space || (size - space) <= (VTOYEFI_PART_BYTES / SIZE_1MB))
     	{
     	    msgbox(GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "STR_SPACE_VAL_INVALID");
@@ -778,12 +787,12 @@ void on_button_update_clicked(GtkWidget *widget, gpointer data)
     }
 
     active = gtk_combo_box_get_active((GtkComboBox *)g_dev_combobox);
-    if (active < 0 || active >= get_disks_len())
+    if (active < 0 || active >= g_disk_num)
     {
         vlog("invalid active combox id %d\n", active);
         return;
     }
-    cur = &g_array_index(disks, ventoy_disk, active);
+    cur = g_disk_list + active;    
 
     if (cur->vtoydata.ventoy_valid == 0)
     {
@@ -1042,11 +1051,7 @@ void on_init_window(GtkBuilder *pBuilder)
     g_partCfgWindow = BUILDER_ITEM(GtkWidget, "part_cfg_dlg");
 
     g_dev_combobox = BUILDER_ITEM(GtkComboBoxText, "combobox_devlist");
-
     g_refresh_button = BUILDER_ITEM(GtkButton, "button_refresh");
-    GtkWidget *image = gtk_image_new_from_icon_name("view-refresh-symbolic", GTK_ICON_SIZE_BUTTON);
-    gtk_button_set_image(g_refresh_button, image);
-
     g_install_button = BUILDER_ITEM(GtkButton, "button_install");
     g_update_button = BUILDER_ITEM(GtkButton, "button_update");
     
@@ -1138,3 +1143,5 @@ int on_exit_window(GtkWidget *widget, gpointer data)
     return FALSE;
 }
 
+
+#endif /* VTOY_USE_UDISKS */

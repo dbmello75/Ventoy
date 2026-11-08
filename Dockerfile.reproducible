@@ -1,4 +1,5 @@
 FROM debian:12-slim
+SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LC_ALL=C \
@@ -95,15 +96,15 @@ RUN (curl -fSL --retry 3 https://github.com/ventoy/vtoytoolchain/releases/downlo
     echo "7994ad5a63d00446da2e95da1f3f03355b272f096d7eb9830417ab14393b3ace  dietlibc-0.34.tar.xz" | sha256sum -c - && \
     tar -xf dietlibc-0.34.tar.xz && \
     cd dietlibc-0.34 && \
-    find . -type f \( -name "Makefile*" -o -name "*.makefile" \) -exec sed -i 's/-Werror//g' {} + 2>/dev/null || true && \
-    prefix=/opt/diet64 make -j$(nproc) || prefix=/opt/diet64 make && \
+    find . -type f \( -name "Makefile*" -o -name "*.makefile" \) -exec sed -i 's/-Werror//g' {} + && \
+    (prefix=/opt/diet64 make -j$(nproc) || prefix=/opt/diet64 make) && \
     prefix=/opt/diet64 make install 2>/dev/null && \
     make clean && \
     sed -i "s/MYARCH:=.*/MYARCH=i386/" Makefile && \
     GCC_VER=$(gcc -dumpversion | cut -d. -f1) && \
     sed -i "s|CC=gcc|CC=gcc -m32 -B/usr/lib/gcc/x86_64-linux-gnu/${GCC_VER}/32/ -L/usr/lib/gcc/x86_64-linux-gnu/${GCC_VER}/32/|" Makefile && \
-    find . -type f \( -name "Makefile*" -o -name "*.makefile" \) -exec sed -i 's/-Werror//g' {} + 2>/dev/null || true && \
-    prefix=/opt/diet32 make -j$(nproc) || prefix=/opt/diet32 make && \
+    find . -type f \( -name "Makefile*" -o -name "*.makefile" \) -exec sed -i 's/-Werror//g' {} + && \
+    (prefix=/opt/diet32 make -j$(nproc) || prefix=/opt/diet32 make) && \
     prefix=/opt/diet32 make install 2>/dev/null && \
     ln -sf /opt/diet64/bin/diet /usr/local/bin/diet && \
     cd / && rm -rf /tmp/dietlibc-build

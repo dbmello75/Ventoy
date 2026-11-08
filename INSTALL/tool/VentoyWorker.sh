@@ -314,7 +314,7 @@ if [ "$MODE" = "install" -a -z "$NONDESTRUCTIVE" ]; then
     dd status=none conv=fsync if=/dev/zero of=$DISK bs=512 count=32 seek=$part2_start_sector
 
     #format part1
-    wait_and_create_part ${PART1} ${PART2}    
+    wait_and_create_part ${PART1} ${PART2} || exit 1    
     if [ -b ${PART1} ]; then
         vtinfo "Format partition 1 ${PART1} ..."
         $mkexfatfs "$VTNEW_LABEL" "$cluster_sectors" ${PART1}

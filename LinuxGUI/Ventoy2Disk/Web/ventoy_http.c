@@ -1,3 +1,6 @@
+#ifdef VTOY_USE_UDISKS
+#include "ventoy_http.c.udisks.inc"
+#else
 /******************************************************************************
  * ventoy_http.c  ---- ventoy http
  * Copyright (c) 2021, longpanda <admin@ventoy.net>
@@ -392,7 +395,7 @@ static int ventoy_write_legacy_grub(int fd, int partstyle)
     ssize_t len;
     off_t offset;
     
-    if (partstyle == GPT_PART_STYLE)
+    if (partstyle)
     {
         vlog("Write GPT stage1 ...\n");
 
@@ -736,11 +739,21 @@ static void * ventoy_update_thread(void *data)
 
     g_current_progress = PT_PRAPARE_FOR_CLEAN;
     vdebug("check disk %s\n", disk->disk_name);
+    if (ventoy_is_disk_mounted(disk->disk_path))
+    {
+        vlog("disk is mounted, now try to unmount it ...\n");
+        ventoy_try_umount_disk(disk->disk_path);
+    }
 
-    vlog("trying to unmount disk...\n");
-
-    int err = ventoy_try_umount_disk(disk);
-    if (err) goto err;
+    if (ventoy_is_disk_mounted(disk->disk_path))
+    {
+        vlog("%s is mounted and can't umount!\n", disk->disk_path);
+        goto err;
+    }
+    else
+    {
+        vlog("disk is not mounted now, we can do continue ...\n");
+    }
 
     g_current_progress = PT_LOAD_CORE_IMG;
     ventoy_unxz_stg1_img();
@@ -801,7 +814,7 @@ static void * ventoy_update_thread(void *data)
             pstGPT->Head.PartTblCrc = ventoy_crc32(pstGPT->PartTbl, sizeof(pstGPT->PartTbl));
             pstGPT->Head.Crc = 0;
             pstGPT->Head.Crc = ventoy_crc32(&(pstGPT->Head), pstGPT->Head.Length);            
-            ventoy_write_gpt_part_table(fd, udisks_block_get_size(disk->blockdev), pstGPT);
+            ventoy_write_gpt_part_table(fd, disk->size_in_byte, pstGPT);
         }
         else
         {
@@ -826,7 +839,7 @@ static void * ventoy_update_thread(void *data)
 
 err:
     g_cur_process_result = 1;
-    vtoy_safe_close_fd(fd);
+    vtoy_safe_close_fd(fd);        
 
 end:
     g_current_progress = PT_FINISH;
@@ -856,12 +869,24 @@ static void * ventoy_install_thread(void *data)
 
     g_current_progress = PT_PRAPARE_FOR_CLEAN;
     vdebug("check disk %s\n", disk->disk_name);
+    if (ventoy_is_disk_mounted(disk->disk_path))
+    {
+        vlog("disk is mounted, now try to unmount it ...\n");
+        ventoy_try_umount_disk(disk->disk_path);
+    }
 
-    int err = ventoy_try_umount_disk(disk);
-    if (err) goto err;
+    if (ventoy_is_disk_mounted(disk->disk_path))
+    {
+        vlog("%s is mounted and can't umount!\n", disk->disk_path);
+        goto err;
+    }
+    else
+    {
+        vlog("disk is not mounted now, we can do continue ...\n");
+    }
 
     g_current_progress = PT_DEL_ALL_PART;
-    ventoy_clean_disk(fd, udisks_block_get_size(disk->blockdev));
+    ventoy_clean_disk(fd, disk->size_in_byte);
     
     g_current_progress = PT_LOAD_CORE_IMG;
     ventoy_unxz_stg1_img();
@@ -873,7 +898,7 @@ static void * ventoy_install_thread(void *data)
     {
         vdebug("Fill GPT part table\n");
         gpt = zalloc(sizeof(VTOY_GPT_INFO));
-        ventoy_fill_gpt(udisks_block_get_size(disk->blockdev), thread->reserveBytes, thread->align4kb, gpt);
+        ventoy_fill_gpt(disk->size_in_byte, thread->reserveBytes, thread->align4kb, gpt);
         Part1StartSector = gpt->PartTbl[0].StartLBA;
         Part1SectorCount = gpt->PartTbl[0].LastLBA - Part1StartSector + 1;
         Part2StartSector = gpt->PartTbl[1].StartLBA;
@@ -881,7 +906,7 @@ static void * ventoy_install_thread(void *data)
     else
     {
         vdebug("Fill MBR part table\n");
-        ventoy_fill_mbr(udisks_block_get_size(disk->blockdev), thread->reserveBytes, thread->align4kb, &MBR);
+        ventoy_fill_mbr(disk->size_in_byte, thread->reserveBytes, thread->align4kb, &MBR);
         Part1StartSector = MBR.PartTbl[0].StartSectorId;
         Part1SectorCount = MBR.PartTbl[0].SectorCount;
         Part2StartSector = MBR.PartTbl[1].StartSectorId;
@@ -890,7 +915,7 @@ static void * ventoy_install_thread(void *data)
     vlog("Part1StartSector:%llu Part1SectorCount:%llu Part2StartSector:%llu\n", 
         (_ull)Part1StartSector, (_ull)Part1SectorCount, (_ull)Part2StartSector);
 
-    if (thread->partstyle != disk->vtoydata.partition_style)
+    if (thread->partstyle != disk->partstyle)
     {
         vlog("Wait for format part1 (partstyle changed) ...\n");
         sleep(1);
@@ -928,9 +953,12 @@ static void * ventoy_install_thread(void *data)
     /* reopen for check part2 data */
     vlog("Checking part2 efi data %s ...\n", disk->disk_path);
     g_current_progress = PT_CHECK_PART2;
-    fd = ventoy_disk_open(disk, "r", O_BINARY);
-
-    if (fd < 0) goto err;
+    fd = open(disk->disk_path, O_RDONLY | O_BINARY);
+    if (fd < 0)
+    {
+        vlog("failed to open %s for check fd:%d err:%d\n", disk->disk_path, fd, errno);
+        goto err;
+    }
 
     if (0 == ventoy_check_efi_part_data(fd, Part2StartSector * 512))
     {
@@ -946,21 +974,24 @@ static void * ventoy_install_thread(void *data)
     
     /* reopen for write part table */
     g_current_progress = PT_WRITE_PART_TABLE;
-    vlog("Writing Partition Table style:%d...\n", thread->partstyle);
+    vlog("Writting Partition Table style:%d...\n", thread->partstyle);
 
-    fd = ventoy_disk_open(disk, "rw", O_BINARY);
-
-    if (fd < 0) goto err;
+    fd = open(disk->disk_path, O_RDWR | O_BINARY);
+    if (fd < 0)
+    {
+        vlog("failed to open %s for part table fd:%d err:%d\n", disk->disk_path, fd, errno);
+        goto err;
+    }
 
     if (thread->partstyle)
     {
-        ventoy_write_gpt_part_table(fd, udisks_block_get_size(disk->blockdev), gpt);
+        ventoy_write_gpt_part_table(fd, disk->size_in_byte, gpt);
     }
     else
     {
         offset = lseek(fd, 0, SEEK_SET);
         len = write(fd, &MBR, 512);
-        vlog("Writing MBR Partition Table %llu %llu\n", (_ull)offset, (_ull)len);
+        vlog("Writting MBR Partition Table %llu %llu\n", (_ull)offset, (_ull)len);
         if (offset != 0 || len != 512)
         {
             goto err;
@@ -1012,7 +1043,14 @@ static int ventoy_api_clean(struct mg_connection *conn, VTOY_JSON *json)
         return 0;
     }
 
-    disk = disks_get_by_name(diskname);
+    for (i = 0; i < g_disk_num; i++)
+    {
+        if (strcmp(g_disk_list[i].disk_name, diskname) == 0)
+        {
+            disk = g_disk_list + i;
+            break;
+        }
+    }
 
     if (disk == NULL)
     {
@@ -1021,14 +1059,27 @@ static int ventoy_api_clean(struct mg_connection *conn, VTOY_JSON *json)
         return 0;
     }
 
+    scnprintf(path, "/sys/block/%s", diskname);
+    if (access(path, F_OK) < 0)
+    {
+        vlog("File %s not exist anymore\n", path);
+        ventoy_json_result(conn, VTOY_JSON_NOTFOUND_RET);
+        return 0;
+    }
+
     vlog("==================================\n");
     vlog("===== ventoy clean %s =====\n", disk->disk_path);
     vlog("==================================\n");
 
-    int err = ventoy_try_umount_disk(disk);
-
-    if (err)
+    if (ventoy_is_disk_mounted(disk->disk_path))
     {
+        vlog("disk is mounted, now try to unmount it ...\n");
+        ventoy_try_umount_disk(disk->disk_path);
+    }
+
+    if (ventoy_is_disk_mounted(disk->disk_path))
+    {
+        vlog("%s is mounted and can't umount!\n", disk->disk_path);
         ventoy_json_result(conn, VTOY_JSON_FAILED_RET);
         return 0;
     }
@@ -1037,8 +1088,7 @@ static int ventoy_api_clean(struct mg_connection *conn, VTOY_JSON *json)
         vlog("disk is not mounted now, we can do the clean ...\n");
     }
 
-    fd = ventoy_disk_open(disk, "rw", O_BINARY);
-
+    fd = open(disk->disk_path, O_RDWR | O_BINARY);
     if (fd < 0)
     {
         vlog("failed to open %s fd:%d err:%d\n", disk->disk_path, fd, errno);
@@ -1046,8 +1096,8 @@ static int ventoy_api_clean(struct mg_connection *conn, VTOY_JSON *json)
         return 0;
     }
 
-    vdebug("start clean %s ...\n", disk->disk_name);
-    ventoy_clean_disk(fd, udisks_block_get_size(disk->blockdev));    
+    vdebug("start clean %s ...\n", disk->disk_model);
+    ventoy_clean_disk(fd, disk->size_in_byte);    
 
     vtoy_safe_close_fd(fd);
     
@@ -1090,7 +1140,14 @@ static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
 
     reserveBytes = (uint64_t)strtoull(reserve_space, NULL, 10);
 
-    disk = disks_get_by_name(diskname);
+    for (i = 0; i < g_disk_num; i++)
+    {
+        if (strcmp(g_disk_list[i].disk_name, diskname) == 0)
+        {
+            disk = g_disk_list + i;
+            break;
+        }
+    }
 
     if (disk == NULL)
     {
@@ -1106,18 +1163,24 @@ static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
         return 0;
     }
 
-    guint64 size_in_bytes =  udisks_block_get_size(disk->blockdev);
-    
-    if (size_in_bytes > 0x20000000000ULL && style == 0)
+    scnprintf(path, "/sys/block/%s", diskname);
+    if (access(path, F_OK) < 0)
+    {
+        vlog("File %s not exist anymore\n", path);
+        ventoy_json_result(conn, VTOY_JSON_NOTFOUND_RET);
+        return 0;
+    }
+
+    if (disk->size_in_byte > 2199023255552ULL && style == 0)
     {
         vlog("disk %s is more than 2TB and GPT is needed\n", path);
         ventoy_json_result(conn, VTOY_JSON_MBR_2TB_RET);
         return 0;
     }
 
-    if ((reserveBytes + VTOYEFI_PART_BYTES * 2) > size_in_bytes)
+    if ((reserveBytes + VTOYEFI_PART_BYTES * 2) > disk->size_in_byte)
     {
-        vlog("reserve space %llu is too big for disk %s %llu\n", (_ull)reserveBytes, path, (_ull)size_in_bytes);
+        vlog("reserve space %llu is too big for disk %s %llu\n", (_ull)reserveBytes, path, (_ull)disk->size_in_byte);
         ventoy_json_result(conn, VTOY_JSON_INVALID_RSV_RET);
         return 0;
     }
@@ -1127,10 +1190,15 @@ static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
          disk->disk_path, (style ? "GPT" : "MBR"), secure_boot, align4kb, (_ull)reserveBytes);
     vlog("==================================================================================\n");
 
-    int err = ventoy_try_umount_disk(disk);
-
-    if (err)
+    if (ventoy_is_disk_mounted(disk->disk_path))
     {
+        vlog("disk is mounted, now try to unmount it ...\n");
+        ventoy_try_umount_disk(disk->disk_path);
+    }
+
+    if (ventoy_is_disk_mounted(disk->disk_path))
+    {
+        vlog("%s is mounted and can't umount!\n", disk->disk_path);
         ventoy_json_result(conn, VTOY_JSON_FAILED_RET);
         return 0;
     }
@@ -1139,7 +1207,7 @@ static int ventoy_api_install(struct mg_connection *conn, VTOY_JSON *json)
         vlog("disk is not mounted now, we can do the install ...\n");
     }
 
-    fd = ventoy_disk_open(disk, "rw", O_BINARY);
+    fd = open(disk->disk_path, O_RDWR | O_BINARY);
     if (fd < 0)
     {
         vlog("failed to open %s fd:%d err:%d\n", disk->disk_path, fd, errno);
@@ -1200,7 +1268,14 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
         return 0;
     }
 
-    disk = disks_get_by_name(diskname);
+    for (i = 0; i < g_disk_num; i++)
+    {
+        if (strcmp(g_disk_list[i].disk_name, diskname) == 0)
+        {
+            disk = g_disk_list + i;
+            break;
+        }
+    }
 
     if (disk == NULL)
     {
@@ -1216,6 +1291,14 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
         return 0;
     }
 
+    scnprintf(path, "/sys/block/%s", diskname);
+    if (access(path, F_OK) < 0)
+    {
+        vlog("File %s not exist anymore\n", path);
+        ventoy_json_result(conn, VTOY_JSON_NOTFOUND_RET);
+        return 0;
+    }
+
     vlog("==========================================================\n");
     vlog("===== ventoy update %s new_secureboot:%u =========\n", disk->disk_path, secure_boot);
     vlog("==========================================================\n");
@@ -1227,10 +1310,15 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
         (_ull)(disk->vtoydata.preserved_space)
         );
 
-    int err = ventoy_try_umount_disk(disk);
-
-    if (err != 0)
+    if (ventoy_is_disk_mounted(disk->disk_path))
     {
+        vlog("disk is mounted, now try to unmount it ...\n");
+        ventoy_try_umount_disk(disk->disk_path);
+    }
+
+    if (ventoy_is_disk_mounted(disk->disk_path))
+    {
+        vlog("%s is mounted and can't umount!\n", disk->disk_path);
         ventoy_json_result(conn, VTOY_JSON_FAILED_RET);
         return 0;
     }
@@ -1239,14 +1327,15 @@ static int ventoy_api_update(struct mg_connection *conn, VTOY_JSON *json)
         vlog("disk is not mounted now, we can do the update ...\n");
     }
 
-    fd = ventoy_disk_open(disk, "rw", O_BINARY);
+    fd = open(disk->disk_path, O_RDWR | O_BINARY);
     if (fd < 0)
     {
+        vlog("failed to open %s fd:%d err:%d\n", disk->disk_path, fd, errno);
         ventoy_json_result(conn, VTOY_JSON_FAILED_RET);
         return 0;
     }
 
-    vdebug("start update thread %s ...\n", disk->disk_name);
+    vdebug("start update thread %s ...\n", disk->disk_model);
     thread = zalloc(sizeof(ventoy_thread_data));
     if (!thread)
     {
@@ -1278,6 +1367,7 @@ static int ventoy_api_refresh_device(struct mg_connection *conn, VTOY_JSON *json
 
     if (g_current_progress == PT_FINISH)
     {
+        g_disk_num = 0;
         ventoy_disk_enumerate_all();
     }
 
@@ -1301,7 +1391,7 @@ static int ventoy_api_get_dev_list(struct mg_connection *conn, VTOY_JSON *json)
         alldev = 0;
     }
 
-    buflen = get_disks_len() * 1024;
+    buflen = g_disk_num * 1024;
     buf = (char *)malloc(buflen + 1024);
     if (!buf)
     {
@@ -1314,12 +1404,15 @@ static int ventoy_api_get_dev_list(struct mg_connection *conn, VTOY_JSON *json)
     VTOY_JSON_FMT_KEY("list");
     VTOY_JSON_FMT_ARY_BEGIN();
 
-    for (i = 0; i < get_disks_len(); i++)
+    for (i = 0; i < g_disk_num; i++)
     {
-        cur = &g_array_index(disks, ventoy_disk, i);
+        cur = g_disk_list + i;
 
-        if (!alldev && cur->hint_ignore) continue;
-      
+        if (alldev == 0 && cur->type != VTOY_DEVICE_USB)
+        {
+            continue;
+        }
+        
         VTOY_JSON_FMT_OBJ_BEGIN();
         VTOY_JSON_FMT_STRN("name", cur->disk_name);
         VTOY_JSON_FMT_STRN("model", cur->disk_model);
@@ -1584,6 +1677,7 @@ void ventoy_code_refresh_device(void)
 {
     if (g_current_progress == PT_FINISH)
     {
+        g_disk_num = 0;
         ventoy_disk_enumerate_all();
     }
 }
@@ -1607,3 +1701,5 @@ void ventoy_code_save_cfg(void)
 {
     ventoy_http_save_cfg();
 }
+
+#endif /* VTOY_USE_UDISKS */

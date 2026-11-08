@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
 EDKARCH=LOONGARCH64
 postfix=la64
